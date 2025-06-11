@@ -6,6 +6,7 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
 from datetime import datetime
+from ui.rum_window import RumRatingsWindow
 
 
 
@@ -63,6 +64,12 @@ class MainWindow(QWidget):
 
         self.layout.addLayout(controls_layout) # add control row to main layout
 
+        # Button to open Rum Ratings window
+        self.rum_ratings_button = QPushButton("View Rum Ratings")
+        self.rum_ratings_button.setEnabled(False)
+        self.rum_ratings_button.clicked.connect(self.open_rum_window)
+        controls_layout.addWidget(self.rum_ratings_button)
+
         # Table to display product data
         self.table = QTableWidget()
         self.table.setColumnCount(5) # number of columns
@@ -111,6 +118,7 @@ class MainWindow(QWidget):
             self.category_dropdown.addItems(categories)
             self.category_dropdown.setEnabled(True)
             self.search_input.setEnabled(True)
+            self.rum_ratings_button.setEnabled(True)
 
             self.apply_filters()    # initially populate table with full data
         except Exception as e:
@@ -152,3 +160,8 @@ class MainWindow(QWidget):
             # Center alignment in all cells
             for col in range(5):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def open_rum_window(self):
+        if hasattr(self, "df_all"):
+            self.rum_window = RumRatingsWindow(self.df_all)
+            self.rum_window.show()
