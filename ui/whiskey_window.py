@@ -2,27 +2,26 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 import pandas as pd
-import difflib
 import os
 from rapidfuzz import process, fuzz
 
-class RumRatingsWindow(QWidget):
+class WhiskeyRatingsWindow(QWidget):
     def __init__(self, alko_df: pd.DataFrame):
         super().__init__()
-        self.setWindowTitle("Rum Ratings from the Rum Howler Blog")
+        self.setWindowTitle("Whiskey Ratings from WhiskyScores")
         self.resize(1100, 700)
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 
-        # Title label
-        title_label = QLabel("Rum Ratings from the Rum Howler Blog")
+        title_label = QLabel("Whiskey Ratings from WhiskyScores")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(title_label)
 
         info_label = QLabel(
-            "The rum ratings below are scraped from the Rum Howler Blog (therumhowlerblog.com).\n"
-            "Product names have been manually adjusted after scraping to better match Alko's naming."
+            "The whiskey ratings below are primarily scraped from WhiskyScores.com.\n"
+            "Additional ratings have been manually gathered from other whiskey rating sites.\n"
+            "Product names have been manually adjusted to better match Alko's naming conventions."
         )
         info_label.setWordWrap(True)
         info_label.setFont(QFont("Arial", 10))
@@ -30,9 +29,9 @@ class RumRatingsWindow(QWidget):
         self.layout.addWidget(info_label)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(7)
         self.table.setHorizontalHeaderLabels([
-            "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)"
+            "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)", "Review Count"
         ])
         self.table.setAlternatingRowColors(True)
         self.table.setStyleSheet("""
@@ -57,47 +56,67 @@ class RumRatingsWindow(QWidget):
                 background-color: transparent;
             }
         """)
-
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
 
         self.load_data(alko_df)
 
     def load_data(self, alko_df):
-        # Load RumHowler ratings
-        ratings_path = os.path.join("assets", "rumhowler_data.xlsx")
+        ratings_path = os.path.join("assets", "whiskey_scores_data.xlsx")
         if not os.path.exists(ratings_path):
             return
 
         ratings_df = pd.read_excel(ratings_path)
 
-        # Filter rums from Alko data
-        rums_df = alko_df[alko_df["Tyyppi"].str.contains("rommi", case=False, na=False)].copy()
+        # Clean and simplify whiskey names
+        ratings_df["Whiskey_clean"] = (
+            ratings_df["Whiskey"]
+            .astype(str)
+            .str.lower()
+            .str.replace(r"[^a-z0-9\s]", "", regex=True)  # remove punctuation
+            .str.replace(r"\s+", " ", regex=True)
+            .str.strip()
+        )
 
-        ratings_df["Rum_clean"] = ratings_df["Rum"].str.lower().str.strip()
+        # Filter Alko whiskey products
+        whiskey_df = alko_df[alko_df["Tyyppi"].str.contains("viski", case=False, na=False)].copy()
+        whiskey_df["Tuotenimi_clean"] = (
+            whiskey_df["Tuotenimi"]
+            .astype(str)
+            .str.lower()
+            .str.replace(r"[^a-z0-9\s]", "", regex=True)
+            .str.replace(r"\s+", " ", regex=True)
+            .str.strip()
+        )
 
-        # Match & assign ratings
+        # Match and assign scores using a lowered threshold
         scores = []
-        for product_name in rums_df["Tuotenimi"]:
-            name_clean = product_name.lower().strip()
-            match = process.extractOne(name_clean, ratings_df["Rum_clean"], scorer=fuzz.token_sort_ratio)
-            if match and match[1] >= 90:
-                score = ratings_df.loc[ratings_df["Rum_clean"] == match[0], "Score"].values[0]
+        review_counts = []
+        for name in whiskey_df["Tuotenimi_clean"]:
+            match = process.extractOne(name, ratings_df["Whiskey_clean"], scorer=fuzz.token_sort_ratio)
+            if match and match[1] >= 75:  # Lowered from 90 to 75
+                matched_row = ratings_df[ratings_df["Whiskey_clean"] == match[0]]
+                score = matched_row["Score"].values[0]
+                count = matched_row["ReviewCount"].values[0]
             else:
                 score = None
+                count = None
             scores.append(score)
+            review_counts.append(count)
 
-        rums_df["Rating"] = scores
+        whiskey_df["Rating"] = scores
+        whiskey_df["ReviewCount"] = review_counts
 
-        # Populate table
-        self.table.setRowCount(len(rums_df))
-        for row, (_, product) in enumerate(rums_df.iterrows()):
+        # Populate the table
+        self.table.setRowCount(len(whiskey_df))
+        for row, (_, product) in enumerate(whiskey_df.iterrows()):
             self.table.setItem(row, 0, QTableWidgetItem(str(product["Tuotenimi"])))
             self.table.setItem(row, 1, QTableWidgetItem(f"{product['Hinta']:.2f}"))
             self.table.setItem(row, 2, QTableWidgetItem(f"{product['Alkoholi%']:.1f}"))
             self.table.setItem(row, 3, QTableWidgetItem(f"{product['Pullokoko (l)']:.2f}"))
             self.table.setItem(row, 4, QTableWidgetItem(f"{product['AlcoholPerEuro']:.4f}"))
             self.table.setItem(row, 5, QTableWidgetItem("" if pd.isna(product["Rating"]) else str(product["Rating"])))
+            self.table.setItem(row, 6, QTableWidgetItem("" if pd.isna(product["ReviewCount"]) else str(product["ReviewCount"])))
 
-            for col in range(6):
+            for col in range(7):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)

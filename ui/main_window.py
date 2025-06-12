@@ -7,6 +7,7 @@ from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
 from datetime import datetime
 from ui.rum_window import RumRatingsWindow
+from ui.whiskey_window import WhiskeyRatingsWindow
 
 
 
@@ -70,6 +71,12 @@ class MainWindow(QWidget):
         self.rum_ratings_button.clicked.connect(self.open_rum_window)
         controls_layout.addWidget(self.rum_ratings_button)
 
+        # Button to open Whiskey Ratings window
+        self.whiskey_ratings_button = QPushButton("View Whiskey Ratings")
+        self.whiskey_ratings_button.setEnabled(False)
+        self.whiskey_ratings_button.clicked.connect(self.open_whiskey_window)
+        controls_layout.addWidget(self.whiskey_ratings_button)
+
         # Table to display product data
         self.table = QTableWidget()
         self.table.setColumnCount(5) # number of columns
@@ -119,6 +126,7 @@ class MainWindow(QWidget):
             self.category_dropdown.setEnabled(True)
             self.search_input.setEnabled(True)
             self.rum_ratings_button.setEnabled(True)
+            self.whiskey_ratings_button.setEnabled(True)
 
             self.apply_filters()    # initially populate table with full data
         except Exception as e:
@@ -165,3 +173,9 @@ class MainWindow(QWidget):
         if hasattr(self, "df_all"):
             self.rum_window = RumRatingsWindow(self.df_all)
             self.rum_window.show()
+
+    def open_whiskey_window(self):
+        if hasattr(self, "df_all"):
+            self.whiskey_window = WhiskeyRatingsWindow(self.df_all)
+            self.whiskey_window.show()
+
