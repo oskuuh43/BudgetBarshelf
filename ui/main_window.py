@@ -1,19 +1,23 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget,
-    QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit
+    QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit, QApplication
 )
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
 from datetime import datetime
 from ui.rum_window import RumRatingsWindow
 from ui.whiskey_window import WhiskeyRatingsWindow
+from utils.dark_theme import create_dark_palette
+from utils.light_theme import create_light_palette
+
 
 
 
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self, initial_theme="light"):
         super().__init__()
+        self.current_theme = initial_theme
         self.setWindowTitle("Alcohol per Euro Calculator")    # Main Window Title
         self.resize(1100, 700)      # Initial size of main window
 
@@ -36,6 +40,12 @@ class MainWindow(QWidget):
         # Controls layout (Filter, search, buttons)
         controls_layout = QHBoxLayout()
         controls_layout.setSpacing(15)
+
+        # Theme toggle button
+        self.theme_button = QPushButton(
+            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        controls_layout.addWidget(self.theme_button)
 
         # Category filter (dropdown)
         self.category_dropdown = QComboBox()
@@ -79,6 +89,7 @@ class MainWindow(QWidget):
 
         # Table to display product data
         self.table = QTableWidget()
+        self.table.verticalHeader().setStyleSheet("color: palette(text);")
         self.table.setColumnCount(5) # number of columns
         self.table.setHorizontalHeaderLabels([
             "Product name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €"
@@ -87,28 +98,41 @@ class MainWindow(QWidget):
         self.table.setAlternatingRowColors(True)    # alternate row colors
         self.table.setStyleSheet("""
             QTableWidget {
-                background-color: white;
-                alternate-background-color: #f2f2f2;
-                selection-background-color: #d0e7ff;  /* Light blue highlight on click */
-                selection-color: black;
-                gridline-color: #ccc;
+                background-color: palette(base);
+                alternate-background-color: palette(alternate-base);
+                color: palette(text);
+                selection-background-color: palette(highlight);
+                selection-color: palette(highlighted-text);
+                gridline-color: palette(dark);
                 font-size: 11pt;
             }
             QTableWidget::item {
                 padding: 6px;
             }
+            QTableWidget::item:!selected:hover {
+                background-color: transparent;
+            }
             QHeaderView::section {
-                background-color: #f2f2f2;
+                background-color: palette(alternate-base);
+                color: palette(text);
                 font-weight: bold;
                 padding: 4px;
-                border: 1px solid #ddd;
+                border: 1px solid palette(dark);
             }
-            QTableWidget::item:hover:!selected {
-                background-color: transparent;  /* No hover highlight unless selected */
-}
         """)
 
         self.layout.addWidget(self.table)   # add table to main layout
+        self.apply_table_stylesheet()
+
+    def open_rum_window(self):
+        if hasattr(self, "df_all"):
+            self.rum_window = RumRatingsWindow(self.df_all, self.current_theme)
+            self.rum_window.show()
+
+    def open_whiskey_window(self):
+        if hasattr(self, "df_all"):
+            self.whiskey_window = WhiskeyRatingsWindow(self.df_all, self.current_theme)
+            self.whiskey_window.show()
 
     def on_fetch_data(self):
         try:
@@ -134,6 +158,78 @@ class MainWindow(QWidget):
 
     def on_category_change(self):
         self.apply_filters()
+
+
+    def apply_table_stylesheet(self):
+        if self.current_theme == "dark":
+            self.table.setStyleSheet("""
+                QTableWidget {
+                    background-color: palette(base);
+                    alternate-background-color: palette(alternate-base);
+                    color: palette(text);
+                    selection-background-color: palette(highlight);
+                    selection-color: palette(highlighted-text);
+                    gridline-color: palette(dark);
+                    font-size: 11pt;
+                }
+                QTableWidget::item {
+                    padding: 6px;
+                }
+                QTableWidget::item:!selected:hover {
+                    background-color: transparent;
+                }
+                QHeaderView::section {
+                    background-color: palette(alternate-base);
+                    color: palette(text);
+                    font-weight: bold;
+                    padding: 4px;
+                    border: 1px solid palette(dark);
+                }
+            """)
+            self.category_dropdown.setStyleSheet("")
+            self.search_input.setStyleSheet("")
+        else:
+            self.table.setStyleSheet("""
+                QTableWidget {
+                    background-color: palette(base);
+                    alternate-background-color: palette(alternate-base);
+                    color: palette(text);
+                    selection-background-color: palette(highlight);
+                    selection-color: palette(highlighted-text);
+                    gridline-color: palette(dark);
+                    font-size: 11pt;
+                }
+                QTableWidget::item {
+                    padding: 6px;
+                }
+                QTableWidget::item:!selected:hover {
+                    background-color: palette(alternate-base);
+                }
+                QHeaderView::section {
+                    background-color: palette(alternate-base);
+                    color: palette(text);
+                    font-weight: bold;
+                    padding: 4px;
+                    border: 1px solid palette(dark);
+                }
+            """)
+            self.category_dropdown.setStyleSheet("""
+                QComboBox {
+                    border: 1px solid gray;
+                    padding: 4px;
+                    background-color: white;
+                    color: black;
+                }
+            """)
+            self.search_input.setStyleSheet("""
+                QLineEdit {
+                    border: 1px solid gray;
+                    padding: 4px;
+                    background-color: white;
+                    color: black;
+                }
+            """)
+
 
     def apply_filters(self):
         if not hasattr(self, "df_all"):
@@ -179,3 +275,14 @@ class MainWindow(QWidget):
             self.whiskey_window = WhiskeyRatingsWindow(self.df_all)
             self.whiskey_window.show()
 
+    def toggle_theme(self):
+        if self.current_theme == "light":
+            QApplication.instance().setPalette(create_dark_palette())
+            self.current_theme = "dark"
+            self.theme_button.setText("Switch to Light Mode")
+        else:
+            QApplication.instance().setPalette(create_light_palette())
+            self.current_theme = "light"
+            self.theme_button.setText("Switch to Dark Mode")
+
+        self.apply_table_stylesheet()  # Reapply table styling based on theme

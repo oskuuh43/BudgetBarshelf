@@ -1,18 +1,27 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+from utils.dark_theme import create_dark_palette
+from utils.light_theme import create_light_palette
 import pandas as pd
-import difflib
 import os
 from rapidfuzz import process, fuzz
 
 class RumRatingsWindow(QWidget):
-    def __init__(self, alko_df: pd.DataFrame):
+    def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Rum Ratings from the Rum Howler Blog")
         self.resize(1100, 700)
+        self.current_theme = theme
+
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
+
+        # Theme toggle button
+        self.theme_button = QPushButton(
+            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        self.layout.addWidget(self.theme_button)
 
         # Title label
         title_label = QLabel("Rum Ratings from the Rum Howler Blog")
@@ -62,6 +71,57 @@ class RumRatingsWindow(QWidget):
         self.layout.addWidget(self.table)
 
         self.load_data(alko_df)
+
+    def apply_table_stylesheet(self):
+        if self.current_theme == "dark":
+            self.table.setStyleSheet("""
+                QTableWidget {
+                    background-color: palette(base);
+                    alternate-background-color: palette(alternate-base);
+                    color: palette(text);
+                    selection-background-color: palette(highlight);
+                    selection-color: palette(highlighted-text);
+                    gridline-color: palette(dark);
+                    font-size: 11pt;
+                }
+                QHeaderView::section {
+                    background-color: palette(alternate-base);
+                    color: palette(text);
+                    font-weight: bold;
+                    border: 1px solid palette(dark);
+                }
+            """)
+        else:
+            self.table.setStyleSheet("""
+                QTableWidget {
+                    background-color: white;
+                    alternate-background-color: #f2f2f2;
+                    color: black;
+                    selection-background-color: #d0e7ff;
+                    selection-color: black;
+                    gridline-color: #ccc;
+                    font-size: 11pt;
+                }
+                QHeaderView::section {
+                    background-color: #f2f2f2;
+                    color: black;
+                    font-weight: bold;
+                    border: 1px solid #ddd;
+                }
+            """)
+
+
+    def toggle_theme(self):
+        if self.current_theme == "light":
+            QApplication.instance().setPalette(create_dark_palette())
+            self.current_theme = "dark"
+            self.theme_button.setText("Switch to Light Mode")
+        else:
+            QApplication.instance().setPalette(create_light_palette())
+            self.current_theme = "light"
+            self.theme_button.setText("Switch to Dark Mode")
+
+        self.apply_table_stylesheet()
 
     def load_data(self, alko_df):
         # Load RumHowler ratings
