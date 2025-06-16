@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
+from utils.style_manager import get_table_stylesheet, get_dropdown_stylesheet, get_search_input_stylesheet
 import pandas as pd
 import os
 from rapidfuzz import process, fuzz
@@ -44,28 +45,6 @@ class RumRatingsWindow(QWidget):
             "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)"
         ])
         self.table.setAlternatingRowColors(True)
-        self.table.setStyleSheet("""
-            QTableWidget {
-                background-color: white;
-                alternate-background-color: #f2f2f2;
-                selection-background-color: #d0e7ff;
-                selection-color: black;
-                gridline-color: #ccc;
-                font-size: 11pt;
-            }
-            QTableWidget::item {
-                padding: 6px;
-            }
-            QHeaderView::section {
-                background-color: #f2f2f2;
-                font-weight: bold;
-                padding: 4px;
-                border: 1px solid #ddd;
-            }
-            QTableWidget::item:hover:!selected {
-                background-color: transparent;
-            }
-        """)
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
@@ -73,42 +52,7 @@ class RumRatingsWindow(QWidget):
         self.load_data(alko_df)
 
     def apply_table_stylesheet(self):
-        if self.current_theme == "dark":
-            self.table.setStyleSheet("""
-                QTableWidget {
-                    background-color: palette(base);
-                    alternate-background-color: palette(alternate-base);
-                    color: palette(text);
-                    selection-background-color: palette(highlight);
-                    selection-color: palette(highlighted-text);
-                    gridline-color: palette(dark);
-                    font-size: 11pt;
-                }
-                QHeaderView::section {
-                    background-color: palette(alternate-base);
-                    color: palette(text);
-                    font-weight: bold;
-                    border: 1px solid palette(dark);
-                }
-            """)
-        else:
-            self.table.setStyleSheet("""
-                QTableWidget {
-                    background-color: white;
-                    alternate-background-color: #f2f2f2;
-                    color: black;
-                    selection-background-color: #d0e7ff;
-                    selection-color: black;
-                    gridline-color: #ccc;
-                    font-size: 11pt;
-                }
-                QHeaderView::section {
-                    background-color: #f2f2f2;
-                    color: black;
-                    font-weight: bold;
-                    border: 1px solid #ddd;
-                }
-            """)
+        self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
 
 
     def toggle_theme(self):

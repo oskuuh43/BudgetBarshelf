@@ -10,6 +10,7 @@ from ui.rum_window import RumRatingsWindow
 from ui.whiskey_window import WhiskeyRatingsWindow
 from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
+from utils.style_manager import get_table_stylesheet, get_dropdown_stylesheet, get_search_input_stylesheet
 
 
 
@@ -96,30 +97,6 @@ class MainWindow(QWidget):
         ])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch) # for resizing
         self.table.setAlternatingRowColors(True)    # alternate row colors
-        self.table.setStyleSheet("""
-            QTableWidget {
-                background-color: palette(base);
-                alternate-background-color: palette(alternate-base);
-                color: palette(text);
-                selection-background-color: palette(highlight);
-                selection-color: palette(highlighted-text);
-                gridline-color: palette(dark);
-                font-size: 11pt;
-            }
-            QTableWidget::item {
-                padding: 6px;
-            }
-            QTableWidget::item:!selected:hover {
-                background-color: transparent;
-            }
-            QHeaderView::section {
-                background-color: palette(alternate-base);
-                color: palette(text);
-                font-weight: bold;
-                padding: 4px;
-                border: 1px solid palette(dark);
-            }
-        """)
 
         self.layout.addWidget(self.table)   # add table to main layout
         self.apply_table_stylesheet()
@@ -159,77 +136,10 @@ class MainWindow(QWidget):
     def on_category_change(self):
         self.apply_filters()
 
-
     def apply_table_stylesheet(self):
-        if self.current_theme == "dark":
-            self.table.setStyleSheet("""
-                QTableWidget {
-                    background-color: palette(base);
-                    alternate-background-color: palette(alternate-base);
-                    color: palette(text);
-                    selection-background-color: palette(highlight);
-                    selection-color: palette(highlighted-text);
-                    gridline-color: palette(dark);
-                    font-size: 11pt;
-                }
-                QTableWidget::item {
-                    padding: 6px;
-                }
-                QTableWidget::item:!selected:hover {
-                    background-color: transparent;
-                }
-                QHeaderView::section {
-                    background-color: palette(alternate-base);
-                    color: palette(text);
-                    font-weight: bold;
-                    padding: 4px;
-                    border: 1px solid palette(dark);
-                }
-            """)
-            self.category_dropdown.setStyleSheet("")
-            self.search_input.setStyleSheet("")
-        else:
-            self.table.setStyleSheet("""
-                QTableWidget {
-                    background-color: palette(base);
-                    alternate-background-color: palette(alternate-base);
-                    color: palette(text);
-                    selection-background-color: palette(highlight);
-                    selection-color: palette(highlighted-text);
-                    gridline-color: palette(dark);
-                    font-size: 11pt;
-                }
-                QTableWidget::item {
-                    padding: 6px;
-                }
-                QTableWidget::item:!selected:hover {
-                    background-color: palette(alternate-base);
-                }
-                QHeaderView::section {
-                    background-color: palette(alternate-base);
-                    color: palette(text);
-                    font-weight: bold;
-                    padding: 4px;
-                    border: 1px solid palette(dark);
-                }
-            """)
-            self.category_dropdown.setStyleSheet("""
-                QComboBox {
-                    border: 1px solid gray;
-                    padding: 4px;
-                    background-color: white;
-                    color: black;
-                }
-            """)
-            self.search_input.setStyleSheet("""
-                QLineEdit {
-                    border: 1px solid gray;
-                    padding: 4px;
-                    background-color: white;
-                    color: black;
-                }
-            """)
-
+        self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
+        self.category_dropdown.setStyleSheet(get_dropdown_stylesheet(self.current_theme))
+        self.search_input.setStyleSheet(get_search_input_stylesheet(self.current_theme))
 
     def apply_filters(self):
         if not hasattr(self, "df_all"):
@@ -264,16 +174,6 @@ class MainWindow(QWidget):
             # Center alignment in all cells
             for col in range(5):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    def open_rum_window(self):
-        if hasattr(self, "df_all"):
-            self.rum_window = RumRatingsWindow(self.df_all)
-            self.rum_window.show()
-
-    def open_whiskey_window(self):
-        if hasattr(self, "df_all"):
-            self.whiskey_window = WhiskeyRatingsWindow(self.df_all)
-            self.whiskey_window.show()
 
     def toggle_theme(self):
         if self.current_theme == "light":

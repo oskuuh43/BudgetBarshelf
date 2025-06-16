@@ -1,17 +1,28 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
+from utils.dark_theme import create_dark_palette
+from utils.light_theme import create_light_palette
+from utils.style_manager import get_table_stylesheet
 import pandas as pd
 import os
 from rapidfuzz import process, fuzz
 
 class WhiskeyRatingsWindow(QWidget):
-    def __init__(self, alko_df: pd.DataFrame):
+    def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Whiskey Ratings from WhiskyScores")
         self.resize(1100, 700)
+        self.current_theme = theme
+
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
+
+        # Theme toggle button
+        self.theme_button = QPushButton(
+            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        self.layout.addWidget(self.theme_button)
 
         title_label = QLabel("Whiskey Ratings from WhiskyScores")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
@@ -34,32 +45,31 @@ class WhiskeyRatingsWindow(QWidget):
             "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)", "Review Count"
         ])
         self.table.setAlternatingRowColors(True)
-        self.table.setStyleSheet("""
-            QTableWidget {
-                background-color: white;
-                alternate-background-color: #f2f2f2;
-                selection-background-color: #d0e7ff;
-                selection-color: black;
-                gridline-color: #ccc;
-                font-size: 11pt;
-            }
-            QTableWidget::item {
-                padding: 6px;
-            }
-            QHeaderView::section {
-                background-color: #f2f2f2;
-                font-weight: bold;
-                padding: 4px;
-                border: 1px solid #ddd;
-            }
-            QTableWidget::item:hover:!selected {
-                background-color: transparent;
-            }
-        """)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
 
+        if self.current_theme == "dark":
+            QApplication.instance().setPalette(create_dark_palette())
+        else:
+            QApplication.instance().setPalette(create_light_palette())
+
+        self.apply_table_stylesheet()
         self.load_data(alko_df)
+
+    def apply_table_stylesheet(self):
+        self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
+
+    def toggle_theme(self):
+        if self.current_theme == "light":
+            QApplication.instance().setPalette(create_dark_palette())
+            self.current_theme = "dark"
+            self.theme_button.setText("Switch to Light Mode")
+        else:
+            QApplication.instance().setPalette(create_light_palette())
+            self.current_theme = "light"
+            self.theme_button.setText("Switch to Dark Mode")
+
+        self.apply_table_stylesheet()
 
     def load_data(self, alko_df):
         ratings_path = os.path.join("assets", "whiskey_scores_data.xlsx")
