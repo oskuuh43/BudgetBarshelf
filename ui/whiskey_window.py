@@ -71,6 +71,18 @@ class WhiskeyRatingsWindow(QWidget):
 
         self.apply_table_stylesheet()
 
+        for w in QApplication.instance().topLevelWidgets():
+            if w is self:
+                continue
+            if hasattr(w, "current_theme") and hasattr(w, "apply_table_stylesheet"):
+                w.current_theme = self.current_theme
+                w.apply_table_stylesheet()
+                if hasattr(w, "theme_button"):
+                    if w.current_theme == "dark":
+                        w.theme_button.setText("Switch to Light Mode")
+                    else:
+                        w.theme_button.setText("Switch to Dark Mode")
+
     def load_data(self, alko_df):
         ratings_path = os.path.join("assets", "whiskey_scores_data.xlsx")
         if not os.path.exists(ratings_path):

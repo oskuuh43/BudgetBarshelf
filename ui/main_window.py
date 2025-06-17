@@ -186,3 +186,9 @@ class MainWindow(QWidget):
             self.theme_button.setText("Switch to Dark Mode")
 
         self.apply_table_stylesheet()  # Reapply table styling based on theme
+
+        for w in (getattr(self, "rum_window", None),
+                  getattr(self, "whiskey_window", None)):
+            if w is not None:
+                w.current_theme = self.current_theme
+                w.apply_table_stylesheet()

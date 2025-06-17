@@ -67,6 +67,18 @@ class RumRatingsWindow(QWidget):
 
         self.apply_table_stylesheet()
 
+        for w in QApplication.instance().topLevelWidgets():
+            if w is self:
+                continue
+            if hasattr(w, "current_theme") and hasattr(w, "apply_table_stylesheet"):
+                w.current_theme = self.current_theme
+                w.apply_table_stylesheet()
+                if hasattr(w, "theme_button"):
+                    if w.current_theme == "dark":
+                        w.theme_button.setText("Switch to Light Mode")
+                    else:
+                        w.theme_button.setText("Switch to Dark Mode")
+
     def load_data(self, alko_df):
         # Load RumHowler ratings
         ratings_path = os.path.join("assets", "rumhowler_data.xlsx")
