@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont, QColor
+from PyQt6.QtGui import QFont
 from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
 from utils.style_manager import get_table_stylesheet
@@ -48,10 +48,7 @@ class WhiskeyRatingsWindow(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
 
-        if self.current_theme == "dark":
-            QApplication.instance().setPalette(create_dark_palette())
-        else:
-            QApplication.instance().setPalette(create_light_palette())
+
 
         self.apply_table_stylesheet()
         self.load_data(alko_df)

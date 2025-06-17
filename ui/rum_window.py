@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
-from utils.style_manager import get_table_stylesheet, get_dropdown_stylesheet, get_search_input_stylesheet
+from utils.style_manager import get_table_stylesheet
 import pandas as pd
 import os
 from rapidfuzz import process, fuzz
@@ -16,7 +16,6 @@ class RumRatingsWindow(QWidget):
         self.current_theme = theme
 
         self.layout = QVBoxLayout(self)
-        self.setLayout(self.layout)
 
         # Theme toggle button
         self.theme_button = QPushButton(

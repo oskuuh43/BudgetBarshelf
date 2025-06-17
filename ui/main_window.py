@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget,
     QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit, QApplication
 )
-from PyQt6.QtGui import QFont, QColor
+from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
 from datetime import datetime
@@ -52,7 +52,7 @@ class MainWindow(QWidget):
         self.category_dropdown = QComboBox()
         self.category_dropdown.setEnabled(False)    # Disabled until data loaded
         self.category_dropdown.setMinimumWidth(200) # Min width for dropdown
-        self.category_dropdown.currentIndexChanged.connect(self.on_category_change) # Handle selection change
+        self.category_dropdown.currentIndexChanged.connect(self.apply_filters) # Handle selection change
 
         # Label for dropdown
         self.dropdown_label = QLabel("Filter by Category:")
@@ -65,7 +65,6 @@ class MainWindow(QWidget):
         self.search_input.setPlaceholderText("Search by name...")
         self.search_input.setEnabled(False) # Disabled until data loaded
         self.search_input.textChanged.connect(self.apply_filters) # Handle text input changes
-
         controls_layout.addWidget(QLabel("Search:"))
         controls_layout.addWidget(self.search_input)
 
@@ -102,12 +101,10 @@ class MainWindow(QWidget):
         self.apply_table_stylesheet()
 
     def open_rum_window(self):
-        if hasattr(self, "df_all"):
             self.rum_window = RumRatingsWindow(self.df_all, self.current_theme)
             self.rum_window.show()
 
     def open_whiskey_window(self):
-        if hasattr(self, "df_all"):
             self.whiskey_window = WhiskeyRatingsWindow(self.df_all, self.current_theme)
             self.whiskey_window.show()
 
@@ -133,8 +130,6 @@ class MainWindow(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Data fetch failed:\n{str(e)}")    # error if failed datafetch
 
-    def on_category_change(self):
-        self.apply_filters()
 
     def apply_table_stylesheet(self):
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
