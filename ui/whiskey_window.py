@@ -57,6 +57,12 @@ class WhiskeyRatingsWindow(QWidget):
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
 
     def toggle_theme(self):
+        """
+        - For choosing Darkmode/lightmode
+        - Update darkmode button text
+        - Restyle table and controls according to theme (darkmode etc.)
+        - Broadcast theme to other open windows (so rum_window and main_window also gets darkmode upon activation)
+        """
         if self.current_theme == "light":
             QApplication.instance().setPalette(create_dark_palette())
             self.current_theme = "dark"
@@ -108,7 +114,7 @@ class WhiskeyRatingsWindow(QWidget):
             .str.strip()
         )
 
-        # Match and assign scores using a lowered threshold
+        # Match and assign scores using Fuzzymatch
         scores = []
         review_counts = []
         for name in whiskey_df["Tuotenimi_clean"]:

@@ -2,6 +2,7 @@ from PyQt6.QtGui import QPalette, QColor
 from PyQt6.QtCore import Qt
 
 def create_light_palette():
+    # For specifying lightmode visuals
     palette = QPalette()
 
     palette.setColor(QPalette.ColorRole.Window, Qt.GlobalColor.white)

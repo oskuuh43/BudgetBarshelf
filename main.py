@@ -8,14 +8,14 @@ import darkdetect
 def main():
     app = QApplication(sys.argv)
 
-    if darkdetect.isDark():
+    if darkdetect.isDark():     # initialize darkmode and lightmode for the app
         app.setPalette(create_dark_palette())
         initial_theme = "dark"
     else:
         app.setPalette(create_light_palette())
         initial_theme = "light"
 
-    window = MainWindow(initial_theme)
+    window = MainWindow(initial_theme)      # Create the main window
     window.show()
     sys.exit(app.exec())
 

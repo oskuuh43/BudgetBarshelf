@@ -14,16 +14,15 @@ class RumRatingsWindow(QWidget):
         self.setWindowTitle("Rum Ratings from the Rum Howler Blog")
         self.resize(1100, 700)
         self.current_theme = theme
-
         self.layout = QVBoxLayout(self)
 
-        # Theme toggle button
+        # Theme toggle button (darkmode/lightmode)
         self.theme_button = QPushButton(
             "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
         self.theme_button.clicked.connect(self.toggle_theme)
         self.layout.addWidget(self.theme_button)
 
-        # Title label
+        # Title label + info
         title_label = QLabel("Rum Ratings from the Rum Howler Blog")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -38,6 +37,7 @@ class RumRatingsWindow(QWidget):
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(info_label)
 
+        # Table setup
         self.table = QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels([
@@ -48,13 +48,19 @@ class RumRatingsWindow(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
 
-        self.load_data(alko_df)
+        self.load_data(alko_df)     # Populate table with alko dataframe
 
     def apply_table_stylesheet(self):
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
 
 
     def toggle_theme(self):
+        """
+        - For choosing Darkmode/lightmode
+        - Update darkmode button text
+        - Restyle table and controls according to theme (darkmode etc.)
+        - Broadcast theme to other open windows (so whiskey_window and main_window also gets darkmode upon activation)
+        """
         if self.current_theme == "light":
             QApplication.instance().setPalette(create_dark_palette())
             self.current_theme = "dark"
@@ -78,6 +84,7 @@ class RumRatingsWindow(QWidget):
                     else:
                         w.theme_button.setText("Switch to Dark Mode")
 
+
     def load_data(self, alko_df):
         # Load RumHowler ratings
         ratings_path = os.path.join("assets", "rumhowler_data.xlsx")
@@ -87,16 +94,15 @@ class RumRatingsWindow(QWidget):
         ratings_df = pd.read_excel(ratings_path)
 
         # Filter rums from Alko data
-        rums_df = alko_df[alko_df["Tyyppi"].str.contains("rommi", case=False, na=False)].copy()
+        rums_df = alko_df[alko_df["Tyyppi"].str.contains("rommi", case=False, na=False)].copy()     # Filter by rums
+        ratings_df["Rum_clean"] = ratings_df["Rum"].str.lower().str.strip()     # Strip and standardize items
 
-        ratings_df["Rum_clean"] = ratings_df["Rum"].str.lower().str.strip()
-
-        # Match & assign ratings
+        # Match & assign ratings using Fuzzymatch
         scores = []
         for product_name in rums_df["Tuotenimi"]:
             name_clean = product_name.lower().strip()
             match = process.extractOne(name_clean, ratings_df["Rum_clean"], scorer=fuzz.token_sort_ratio)
-            if match and match[1] >= 90:
+            if match and match[1] >= 90:    # match treshhold 90
                 score = ratings_df.loc[ratings_df["Rum_clean"] == match[0], "Score"].values[0]
             else:
                 score = None

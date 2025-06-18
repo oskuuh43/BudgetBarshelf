@@ -1,4 +1,5 @@
 def get_table_stylesheet(theme: str) -> str:
+    # Return css style for either darkmode or lightmode
     if theme == "dark":
         return """
             QTableWidget {

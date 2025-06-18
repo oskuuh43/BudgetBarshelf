@@ -2,6 +2,7 @@ from PyQt6.QtGui import QPalette, QColor
 from PyQt6.QtCore import Qt
 
 def create_dark_palette():
+    # For specifying darkmode visuals
     palette = QPalette()
 
     # Backgrounds
