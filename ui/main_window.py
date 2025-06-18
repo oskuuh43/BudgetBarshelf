@@ -1,17 +1,23 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget,
-    QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit
+    QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit, QApplication
 )
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
 from datetime import datetime
+from ui.rum_window import RumRatingsWindow
+from ui.whiskey_window import WhiskeyRatingsWindow
+from utils.dark_theme import create_dark_palette
+from utils.light_theme import create_light_palette
+from utils.style_manager import get_table_stylesheet, get_dropdown_stylesheet, get_search_input_stylesheet
 
 
 
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self, initial_theme="light"):
         super().__init__()
+        self.current_theme = initial_theme      # Darkmode/lightmode
         self.setWindowTitle("Alcohol per Euro Calculator")    # Main Window Title
         self.resize(1100, 700)      # Initial size of main window
 
@@ -26,6 +32,7 @@ class MainWindow(QWidget):
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)         # Centerd Title
         self.layout.addWidget(self.title_label)     # Add title to the layout
 
+        # Timestamp for data fetch (updated upon fetch)
         self.updated_label = QLabel("Data not fetched yet")
         self.updated_label.setFont(QFont("Arial", 10))
         self.updated_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -35,11 +42,17 @@ class MainWindow(QWidget):
         controls_layout = QHBoxLayout()
         controls_layout.setSpacing(15)
 
+        # Darkmode/Lightmode toggle button
+        self.theme_button = QPushButton(
+            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        controls_layout.addWidget(self.theme_button)
+
         # Category filter (dropdown)
         self.category_dropdown = QComboBox()
         self.category_dropdown.setEnabled(False)    # Disabled until data loaded
         self.category_dropdown.setMinimumWidth(200) # Min width for dropdown
-        self.category_dropdown.currentIndexChanged.connect(self.on_category_change) # Handle selection change
+        self.category_dropdown.currentIndexChanged.connect(self.apply_filters) # Handle selection change
 
         # Label for dropdown
         self.dropdown_label = QLabel("Filter by Category:")
@@ -52,7 +65,6 @@ class MainWindow(QWidget):
         self.search_input.setPlaceholderText("Search by name...")
         self.search_input.setEnabled(False) # Disabled until data loaded
         self.search_input.textChanged.connect(self.apply_filters) # Handle text input changes
-
         controls_layout.addWidget(QLabel("Search:"))
         controls_layout.addWidget(self.search_input)
 
@@ -63,40 +75,49 @@ class MainWindow(QWidget):
 
         self.layout.addLayout(controls_layout) # add control row to main layout
 
+        # Button to open Rum Ratings window
+        self.rum_ratings_button = QPushButton("View Rum Ratings")
+        self.rum_ratings_button.setEnabled(False)
+        self.rum_ratings_button.clicked.connect(self.open_rum_window)
+        controls_layout.addWidget(self.rum_ratings_button)
+
+        # Button to open Whiskey Ratings window
+        self.whiskey_ratings_button = QPushButton("View Whiskey Ratings")
+        self.whiskey_ratings_button.setEnabled(False)
+        self.whiskey_ratings_button.clicked.connect(self.open_whiskey_window)
+        controls_layout.addWidget(self.whiskey_ratings_button)
+
         # Table to display product data
         self.table = QTableWidget()
+        self.table.verticalHeader().setStyleSheet("color: palette(text);")
         self.table.setColumnCount(5) # number of columns
         self.table.setHorizontalHeaderLabels([
             "Product name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €"
         ])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch) # for resizing
         self.table.setAlternatingRowColors(True)    # alternate row colors
-        self.table.setStyleSheet("""
-            QTableWidget {
-                background-color: white;
-                alternate-background-color: #f2f2f2;
-                selection-background-color: #d0e7ff;  /* Light blue highlight on click */
-                selection-color: black;
-                gridline-color: #ccc;
-                font-size: 11pt;
-            }
-            QTableWidget::item {
-                padding: 6px;
-            }
-            QHeaderView::section {
-                background-color: #f2f2f2;
-                font-weight: bold;
-                padding: 4px;
-                border: 1px solid #ddd;
-            }
-            QTableWidget::item:hover:!selected {
-                background-color: transparent;  /* No hover highlight unless selected */
-}
-        """)
 
         self.layout.addWidget(self.table)   # add table to main layout
+        self.apply_table_stylesheet()
+
+    def open_rum_window(self):
+        # Instantiate rum window with same dataset and theme (darkmode/lightmode)
+            self.rum_window = RumRatingsWindow(self.df_all, self.current_theme)
+            self.rum_window.show()
+
+    def open_whiskey_window(self):
+        # Instantiate whiskey window with same dataset and theme (darkmode/lightmode)
+            self.whiskey_window = WhiskeyRatingsWindow(self.df_all, self.current_theme)
+            self.whiskey_window.show()
 
     def on_fetch_data(self):
+        """
+        - Download and clean Data
+        - Store data
+        - Update Timestamp
+        - Populate Category dropdown, enable search and buttons
+        - Error if data fetch fails
+        """
         try:
             df = fetch_and_process_data()   # Download and process the data
             self.df_all = df    # Save dataset to memory
@@ -111,15 +132,21 @@ class MainWindow(QWidget):
             self.category_dropdown.addItems(categories)
             self.category_dropdown.setEnabled(True)
             self.search_input.setEnabled(True)
+            self.rum_ratings_button.setEnabled(True)
+            self.whiskey_ratings_button.setEnabled(True)
 
             self.apply_filters()    # initially populate table with full data
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Data fetch failed:\n{str(e)}")    # error if failed datafetch
 
-    def on_category_change(self):
-        self.apply_filters()
+
+    def apply_table_stylesheet(self):
+        self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
+        self.category_dropdown.setStyleSheet(get_dropdown_stylesheet(self.current_theme))
+        self.search_input.setStyleSheet(get_search_input_stylesheet(self.current_theme))
 
     def apply_filters(self):
+        # Filter data by category and search term. delegate to populate_table
         if not hasattr(self, "df_all"):
             return
 
@@ -139,6 +166,7 @@ class MainWindow(QWidget):
         self.populate_table(filtered_df)    # Update with filterd data
 
     def populate_table(self, df):
+        # Rebuld table according to specifications, formatting and centering text
         self.table.setRowCount(len(df))     # set number of rows
         for row, (_, product) in enumerate(df.iterrows()):
             # Populate cells with relevant data
@@ -152,3 +180,27 @@ class MainWindow(QWidget):
             # Center alignment in all cells
             for col in range(5):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def toggle_theme(self):
+        """
+        - For choosing Darkmode/lightmode
+        - Update darkmode button text
+        - Restyle table and controls according to theme (darkmode etc.)
+        - Broadcast theme to other open windows (so whiskey_window and rum_window also gets darkmode upon activation)
+        """
+        if self.current_theme == "light":
+            QApplication.instance().setPalette(create_dark_palette())
+            self.current_theme = "dark"
+            self.theme_button.setText("Switch to Light Mode")
+        else:
+            QApplication.instance().setPalette(create_light_palette())
+            self.current_theme = "light"
+            self.theme_button.setText("Switch to Dark Mode")
+
+        self.apply_table_stylesheet()  # Reapply table styling based on theme
+
+        for w in (getattr(self, "rum_window", None),
+                  getattr(self, "whiskey_window", None)):
+            if w is not None:
+                w.current_theme = self.current_theme
+                w.apply_table_stylesheet()
