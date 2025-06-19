@@ -2,12 +2,14 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget,
     QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit, QApplication
 )
+import os
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
 from datetime import datetime
 from ui.rum_window import RumRatingsWindow
 from ui.whiskey_window import WhiskeyRatingsWindow
+from ui.cocktail_window import CocktailsWindow
 from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
 from utils.style_manager import get_table_stylesheet, get_dropdown_stylesheet, get_search_input_stylesheet
@@ -55,7 +57,7 @@ class MainWindow(QWidget):
         self.category_dropdown.currentIndexChanged.connect(self.apply_filters) # Handle selection change
 
         # Label for dropdown
-        self.dropdown_label = QLabel("Filter by Category:")
+        self.dropdown_label = QLabel("Category:")
         self.dropdown_label.setFont(QFont("Arial", 10))
         controls_layout.addWidget(self.dropdown_label)
         controls_layout.addWidget(self.category_dropdown)
@@ -65,7 +67,6 @@ class MainWindow(QWidget):
         self.search_input.setPlaceholderText("Search by name...")
         self.search_input.setEnabled(False) # Disabled until data loaded
         self.search_input.textChanged.connect(self.apply_filters) # Handle text input changes
-        controls_layout.addWidget(QLabel("Search:"))
         controls_layout.addWidget(self.search_input)
 
         # Fetch button to fetch alkos product data
@@ -86,6 +87,11 @@ class MainWindow(QWidget):
         self.whiskey_ratings_button.setEnabled(False)
         self.whiskey_ratings_button.clicked.connect(self.open_whiskey_window)
         controls_layout.addWidget(self.whiskey_ratings_button)
+
+        self.cocktails_button = QPushButton("View Cocktails")
+        self.cocktails_button.setEnabled(False)
+        self.cocktails_button.clicked.connect(self.open_cocktails_window)
+        controls_layout.addWidget(self.cocktails_button)
 
         # Table to display product data
         self.table = QTableWidget()
@@ -109,6 +115,20 @@ class MainWindow(QWidget):
         # Instantiate whiskey window with same dataset and theme (darkmode/lightmode)
             self.whiskey_window = WhiskeyRatingsWindow(self.df_all, self.current_theme)
             self.whiskey_window.show()
+
+    def open_cocktails_window(self):
+        try:
+            path = os.path.join("assets", "all_drinks_metric.csv")
+            # pass along current_theme so the new window can pick it up
+            self.cocktails_window = CocktailsWindow(path, self.current_theme)
+            self.cocktails_window.show()
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Error opening cocktails",
+                f"{e.__class__.__name__}: {e}"
+            )
+
 
     def on_fetch_data(self):
         """
@@ -134,6 +154,7 @@ class MainWindow(QWidget):
             self.search_input.setEnabled(True)
             self.rum_ratings_button.setEnabled(True)
             self.whiskey_ratings_button.setEnabled(True)
+            self.cocktails_button.setEnabled(True)
 
             self.apply_filters()    # initially populate table with full data
         except Exception as e:
@@ -199,8 +220,11 @@ class MainWindow(QWidget):
 
         self.apply_table_stylesheet()  # Reapply table styling based on theme
 
-        for w in (getattr(self, "rum_window", None),
-                  getattr(self, "whiskey_window", None)):
+        for w in (
+            getattr(self, "rum_window", None),
+            getattr(self, "whiskey_window", None),
+            getattr(self, "cocktails_window", None)
+        ):
             if w is not None:
                 w.current_theme = self.current_theme
                 w.apply_table_stylesheet()
