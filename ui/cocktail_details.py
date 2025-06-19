@@ -10,36 +10,47 @@ class CocktailDetailWindow(QWidget):
         super().__init__()
         self.current_theme = theme
         self.setWindowTitle(cocktail_data.get("strDrink", "Cocktail"))
-        self.resize(500, 700)
+        self.resize(600, 800)
 
         layout = QVBoxLayout(self)
         self.setLayout(layout)
 
-        # Image
+        # IMAGE AT TOP OF PAGE
         thumb = cocktail_data.get("strDrinkThumb", "")
         if isinstance(thumb, str) and thumb.startswith("http"):
             try:
                 resp = requests.get(thumb, timeout=5)
+                resp.raise_for_status()
                 pix = QPixmap()
                 pix.loadFromData(resp.content)
-                lbl = QLabel()
-                lbl.setPixmap(pix.scaledToWidth(300, Qt.SmoothTransformation))
-                lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                layout.addWidget(lbl)
+                img_label = QLabel()
+                img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                img_label.setPixmap(
+                    pix.scaledToWidth(
+                        300,
+                        Qt.TransformationMode.SmoothTransformation
+                    )
+                )
+                layout.addWidget(img_label)
             except Exception:
-                pass
+                no_img = QLabel("No image available")
+                no_img.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                layout.addWidget(no_img)
+        else:
+            no_img = QLabel("No image available")
+            no_img.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(no_img)
 
-        # Ingredients
+        # INGREDIENTS FIELD
         ingredients = []
         for i in range(1, 16):
             ing = cocktail_data.get(f"strIngredient{i}")
             meas = cocktail_data.get(f"strMeasure{i}")
             if pd.notna(ing) and ing:
-                text = (
-                    f"{meas.strip()} {ing.strip()}"
-                    if pd.notna(meas) and meas else ing.strip()
-                )
-                ingredients.append(text)
+                if pd.notna(meas) and meas:
+                    ingredients.append(f"{meas.strip()} {ing.strip()}")
+                else:
+                    ingredients.append(ing.strip())
 
         layout.addWidget(QLabel("Ingredients:"))
         ing_text = QTextEdit("\n".join(ingredients))
@@ -47,13 +58,14 @@ class CocktailDetailWindow(QWidget):
         ing_text.setFixedHeight(min(len(ingredients) * 24 + 10, 200))
         layout.addWidget(ing_text)
 
-        # Instructions
+        # INSTRUCTIONS FIELD
         layout.addWidget(QLabel("Instructions:"))
         instr = cocktail_data.get("strInstructions", "")
-        instr_text = QTextEdit(instr)
-        instr_text.setReadOnly(True)
+        instr_edit = QTextEdit(instr)
+        instr_edit.setReadOnly(True)
+
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setWidget(instr_text)
-        layout.addWidget(scroll)
+        scroll.setWidget(instr_edit)
+        layout.addWidget(scroll, stretch=1)

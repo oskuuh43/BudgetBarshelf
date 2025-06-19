@@ -16,7 +16,7 @@ class CocktailsWindow(QWidget):
         print("CocktailsWindow.__init__() start")
         self.current_theme = theme
         self.setWindowTitle("Cocktail List")
-        self.resize(800, 600)
+        self.resize(1000, 800)
 
         layout = QVBoxLayout(self)
         self.setLayout(layout)
