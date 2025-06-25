@@ -2,11 +2,13 @@ import os
 import pandas as pd
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QHeaderView, QMessageBox, QLineEdit, QLabel, QHBoxLayout
+    QHeaderView, QMessageBox, QLineEdit, QLabel, QHBoxLayout, QComboBox
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from utils.style_manager import get_table_stylesheet
 from ui.cocktail_details import CocktailDetailWindow
+from utils.ingredients_mapper import normalize_ingredient
 
 class CocktailsWindow(QWidget):
     def __init__(self, csv_path: str, theme="light"):
@@ -19,6 +21,16 @@ class CocktailsWindow(QWidget):
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"CSV not found: {csv_path}")
         self.df_all = pd.read_csv(csv_path)
+
+        def make_ing_list(row):
+            out = []
+            for i in range(1, 16):
+                raw = row.get(f"strIngredient{i}")
+                if pd.notna(raw) and raw.strip():
+                    out.append(normalize_ingredient(raw))
+            return out
+
+        self.df_all["ingredients_list"] = self.df_all.apply(make_ing_list, axis=1)
         self.df_current = self.df_all.copy()
 
         layout = QVBoxLayout(self)
@@ -30,7 +42,7 @@ class CocktailsWindow(QWidget):
         search_layout.addWidget(QLabel("Search:"))
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Filter by name…")
-        self.search_input.textChanged.connect(self.apply_search)
+        self.search_input.textChanged.connect(self.apply_filters)
         search_layout.addWidget(self.search_input, stretch=1)
         layout.addLayout(search_layout)
 
@@ -43,21 +55,52 @@ class CocktailsWindow(QWidget):
         )
         layout.addWidget(self.table)
 
+        self.ing_combo = QComboBox()
+        self.ing_combo.setMinimumWidth(200)
+        self.ing_combo.setEditable(False)
+        self.ing_combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.ing_combo.setPlaceholderText("Filter by ingredients…")
+        search_layout.addWidget(self.ing_combo)
+
+
+        # populate all unique canonical ingredients:
+        all_ings = sorted({ing for lst in self.df_all["ingredients_list"] for ing in lst})
+        model = QStandardItemModel()
+        for ing in all_ings:
+            item = QStandardItem(ing)
+            item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+            item.setData(Qt.CheckState.Unchecked, Qt.ItemDataRole.CheckStateRole)
+            model.appendRow(item)
+        self.ing_combo.setModel(model)
+        model.itemChanged.connect(self.apply_filters)
+
+
         # initial population
-        self.apply_search()  # will populate self.df_current
+        self.apply_filters()  # will populate self.df_current
 
         # Style & hook up double-click
         self.apply_table_stylesheet()
         self.table.cellDoubleClicked.connect(self.open_detail)
 
-    def apply_search(self):
+    def apply_filters(self):
         term = self.search_input.text().strip().lower()
+
+        # 1) name filter
         if term:
-            mask = self.df_all["strDrink"] \
-                          .str.contains(term, case=False, regex=False)
-            df = self.df_all[mask]
+            df = self.df_all[self.df_all["strDrink"]
+            .str.contains(term, case=False, regex=False)]
         else:
             df = self.df_all
+
+        # 2) ingredient filter
+        checked = [
+            self.ing_combo.model().item(row).text()
+            for row in range(self.ing_combo.model().rowCount())
+            if self.ing_combo.model().item(row).checkState() == Qt.CheckState.Checked
+        ]
+        if checked:
+            df = df[df["ingredients_list"]
+            .apply(lambda ings: all(chip in ings for chip in checked))]
 
         self.df_current = df
         self._populate_table(df)
