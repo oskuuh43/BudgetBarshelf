@@ -52,8 +52,23 @@ def get_table_stylesheet(theme: str) -> str:
         """
 
 def get_dropdown_stylesheet(theme: str) -> str:
+    # Dark‐mode styling for QComboBox and its popup list
     if theme == "dark":
-        return ""
+        return """
+        QComboBox {
+            background-color: palette(base);
+            color: palette(text);
+            border: 1px solid palette(dark);
+            padding: 4px;
+        }
+        QComboBox QAbstractItemView {
+            background-color: palette(base);
+            color: palette(text);
+            selection-background-color: palette(highlight);
+            selection-color: palette(highlighted-text);
+            border: 1px solid palette(dark);
+        }
+        """
     else:
         return """
             QComboBox {
@@ -65,8 +80,16 @@ def get_dropdown_stylesheet(theme: str) -> str:
         """
 
 def get_search_input_stylesheet(theme: str) -> str:
+    # Dark‐mode styling for QLineEdit
     if theme == "dark":
-        return ""
+        return """
+        QLineEdit {
+            background-color: palette(base);
+            color: palette(text);
+            border: 1px solid palette(dark);
+            padding: 4px;
+        }
+        """
     else:
         return """
             QLineEdit {

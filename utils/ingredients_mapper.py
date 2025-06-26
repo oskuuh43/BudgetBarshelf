@@ -1,6 +1,8 @@
-# ingredients_mapper.py
 
-# 1) the map: raw → canonical
+"""
+original_data maps all ingredients to more generalized items
+"""
+
 original_data = {
     # Beer
     "Lager": "Beer",
@@ -410,6 +412,7 @@ original_data = {
 
 }
 
+# FAMILY_OF divides items to even broader categories
 FAMILY_OF = {
     # Spirits
     "Flavoured Brandy": "Spirits",
