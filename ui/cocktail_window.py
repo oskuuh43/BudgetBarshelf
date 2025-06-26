@@ -8,7 +8,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from utils.style_manager import get_table_stylesheet
 from ui.cocktail_details import CocktailDetailWindow
-from utils.ingredients_mapper import normalize_ingredient
+from utils.ingredients_mapper import normalize_ingredient, FAMILY_OF
 
 class CocktailsWindow(QWidget):
     def __init__(self, csv_path: str, theme="light"):
@@ -63,14 +63,28 @@ class CocktailsWindow(QWidget):
         search_layout.addWidget(self.ing_combo)
 
 
-        # populate all unique canonical ingredients:
         all_ings = sorted({ing for lst in self.df_all["ingredients_list"] for ing in lst})
-        model = QStandardItemModel()
+        groups = {}
         for ing in all_ings:
-            item = QStandardItem(ing)
-            item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
-            item.setData(Qt.CheckState.Unchecked, Qt.ItemDataRole.CheckStateRole)
-            model.appendRow(item)
+            fam = FAMILY_OF.get(ing, "Other")
+            groups.setdefault(fam, []).append(ing)
+
+        # define the order in which families appear
+        family_order = ["Spirits", "Liqueurs", "Wines and Vermouths", "Mixers", "Garnishes", "Fruits and Vegetables", "Sweeteners", "Other"]
+
+        model = QStandardItemModel()
+        for fam in family_order:
+            if fam in groups:
+                # header (non‐selectable divider)
+                header = QStandardItem(f"— {fam} —")
+                header.setFlags(Qt.ItemFlag.NoItemFlags)
+                model.appendRow(header)
+                # then each ingredient under that family
+                for ing in sorted(groups[fam]):
+                    item = QStandardItem(ing)
+                    item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                    item.setData(Qt.CheckState.Unchecked, Qt.ItemDataRole.CheckStateRole)
+                    model.appendRow(item)
         self.ing_combo.setModel(model)
         model.itemChanged.connect(self.apply_filters)
 

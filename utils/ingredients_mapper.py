@@ -46,9 +46,9 @@ original_data = {
     "Cranberry vodka": "Flavored Vodka",
 
     # White Rum
-    "Light rum": "White rum",
-    "White rum": "White rum",
-    "White Rum": "White rum",
+    "Light rum": "White Rum",
+    "White rum": "White Rum",
+    "White Rum": "White Rum",
 
     # Vodka
     "Vodka": "Vodka",
@@ -164,7 +164,7 @@ original_data = {
     "Ice": "Ice",
     "Coca-Cola": "Cola",
     "Ginger beer": "Ginger Soda",
-    "Soda water": "Soda water",
+    "Soda water": "Soda Water",
     "Lemon": "Lemon",
     "Grapefruit juice": "Uncommon Juices",
     "Peach nectar": "Uncommon Juices",
@@ -196,7 +196,7 @@ original_data = {
     "Tabasco sauce": "Herbs and Spices",
     "Lemon peel": "Garnish",
     "Lemon Juice": "Lemon",
-    "Tonic water": "Tonic water",
+    "Tonic water": "Tonic Water",
     "Orange Juice": "Orange",
     "Anise": "Herbs and Spices",
     "Sprite": "Lemon-Lime Soda",
@@ -230,10 +230,10 @@ original_data = {
     "Lime juice cordial": "Lime",
     "Mint": "Herbs and Spices",
     "Soda Water": "Soda Water",
-    "Pineapple juice": "Pineapple juice",
+    "Pineapple juice": "Pineapple Juice",
     "Yoghurt": "Yoghurt",
     "Pineapple Juice": "Pineapple Juice",
-    "Cranberry juice": "Cranberry juice",
+    "Cranberry juice": "Cranberry Juice",
     "Black pepper": "Herbs and Spices",
     "Pepper": "Herbs and Spices",
     "Cardamom": "Herbs and Spices",
@@ -285,10 +285,10 @@ original_data = {
     "Zima": "Lemon-Lime Soda",
     "lemon juice": "Lemon",
     "orange juice": "Orange",
-    "pineapple juice": "Pineapple juice",
+    "pineapple juice": "Pineapple Juice",
     "Butter": "Dairy",
     "Carbonated soft drink": "Uncommon Soft-Drinks",
-    "Carbonated water": "Soda water",
+    "Carbonated water": "Soda Water",
     "Cocoa powder": "Herbs and Spices",
     "Coconut milk": "Coconut Milk",
     "Fresca": "Uncommon Soft-Drinks",
@@ -298,7 +298,7 @@ original_data = {
     "Saline solution": "Water",
     "Jello": "Sweets",
     "Kiwi": "Kiwi",
-    "Daiquiri mix": "Cocktail mix",
+    "Daiquiri mix": "Cocktail Mix",
     "Dr. Pepper": "Dr. Pepper",
     "Fennel seeds": "Herbs and Spices",
     "Condensed milk": "Condensed Milk",
@@ -396,7 +396,7 @@ original_data = {
     "Kirschwasser": "Flavored Brandy",
     "Peach Brandy": "Flavored Brandy",
     "Pisco": "Flavored Brandy",
-    "Poire Williams": "Flavoured Brandy",
+    "Poire Williams": "Flavored Brandy",
 
     # Bitters
     "Bitters": "Bitters",
@@ -408,10 +408,150 @@ original_data = {
     "Rhubarb bitters": "Bitters",
 
 
-    #new
+}
+
+FAMILY_OF = {
+    # Spirits
+    "Flavoured Brandy": "Spirits",
+    "Rum": "Spirits",
+    "Flavored Rum": "Spirits",
+    "Flavored Brandy": "Spirits",
+    "Gin": "Spirits",
+    "Flavored Vodka": "Spirits",
+    "White Rum": "Spirits",
+    "Vodka": "Spirits",
+    "Whiskey": "Spirits",
+    "Brandy": "Spirits",
+    "Flavored Whiskey": "Spirits",
+    "Tequila": "Spirits",
+
+    # Liqueurs
+    "Triple Sec": "Liqueurs",
+    "Amaretto": "Liqueurs",
+    "Coffee Liqueur": "Liqueurs",
+    "Fruit Liqueur": "Liqueurs",
+    "Herbal Liqueur": "Liqueurs",
+    "Nut Liqueur": "Liqueurs",
+    "Cream Liqueur": "Liqueurs",
+    "Floral Liqueur": "Liqueurs",
+    "Cinnamon Liqueur": "Liqueurs",
+    "Anise Liqueur": "Liqueurs",
+    "Blackcurrant Liqueur": "Liqueurs",
+    "Raspberry Liqueur": "Liqueurs",
+    "Melon Liqueur": "Liqueurs",
+    "Blueberry Liqueur": "Liqueurs",
+    "Butterscotch Liqueur": "Liqueurs",
+    "Apple Liqueur": "Liqueurs",
+    "Peach Liqueur": "Liqueurs",
+    "Banana Liqueur": "Liqueurs",
+    "Chocolate Liqueur": "Liqueurs",
+    "Peppermint Liqueur": "Liqueurs",
+    "Vanilla Liqueur": "Liqueurs",
+    "Coconut Liqueur": "Liqueurs",
+    "Strawberry Liqueur": "Liqueurs",
+    "Everclear": "Liqueurs",
+    "Chartreuse": "Liqueurs",
+    "Kummel Liqueur": "Liqueurs",
+    "Benedictine": "Liqueurs",
+    "Campari": "Liqueurs",
+    "JÃ¤germeister": "Liqueurs",
+    "Elderflower Liqueur": "Liqueurs",
+    "Strong Spirits": "Liqueurs",
+    "Egg Liqueur": "Liqueurs",
+    "Aperol": "Liqueurs",
+    "Aquavit": "Liqueurs",
+    "Cherry Liqueur": "Liqueurs",
+    "Cachaca Spirit": "Liqueurs",
+    "Bitter Liqueur": "Liqueurs",
+    "Jägermeister": "Liqueurs",
+    "Limoncello Liqueur": "Liqueurs",
+    "Blackberry Liqueur": "Liqueurs",
+    "Kiwi Liqueur": "Liqueurs",
 
 
 
+    # Wines & Fortified
+    "Wine": "Wines and Vermouths",
+    "Sparkling Wine": "Wines and Vermouths",
+    "Fortified Wine": "Wines and Vermouths",
+    "Vermouth": "Wines and Vermouths",
+    "Sherry": "Wines and Vermouths",
+    "Port": "Wines and Vermouths",
+    "Champagne": "Wines and Vermouths",
+    "Sweet Vermouth": "Wines and Vermouths",
+    "Dry Vermouth": "Wines and Vermouths",
+    "Red Wine": "Wines and Vermouths",
+
+    # Mixers & Bases
+    "Juice": "Mixers",
+    "Fruit Juice": "Mixers",
+    "Lemon-Lime Soda": "Mixers",
+    "Soda Water": "Mixers",
+    "Cream": "Mixers",
+    "Milk": "Mixers",
+    "Dairy": "Mixers",
+    "Chocolate Milk": "Mixers",
+    "Cocktail Mix": "Mixers",
+    "Uncommon Soft-Drinks": "Mixers",
+    "Uncommon Juices": "Mixers",
+    "Water": "Mixers",
+    "Sour mix": "Mixers",
+    "Tea": "Mixers",
+    "Apple juice": "Mixers",
+    "Lemonade": "Mixers",
+    "Cola": "Mixers",
+    "Ginger Soda": "Mixers",
+    "Sweet and sour": "Mixers",
+    "Cranberry Juice": "Mixers",
+    "Root beer": "Mixers",
+    "Coffee": "Mixers",
+    "Beer": "Mixers",
+    "Cider": "Mixers",
+    "Tonic Water": "Mixers",
+    "Pineapple Juice": "Mixers",
+    "Olive Brine": "Mixers",
+    "Orange Juice": "Mixers",
+    "Coconut Milk": "Mixers",
+    "Dr. Pepper": "Mixers",
+    "Condensed Milk": "Mixers",
+    "Grape juice": "Mixers",
+
+
+
+    # Sweeteners
+    "Sweetener": "Sweeteners",
+    "Flavored Syrup": "Sweeteners",
+
+    # Fruits and Vegetables
+    "Mango": "Fruits and Vegetables",
+    "Cantaloupe": "Fruits and Vegetables",
+    "Strawberries": "Fruits and Vegetables",
+    "Orange": "Fruits and Vegetables",
+    "Berries": "Fruits and Vegetables",
+    "Lemon": "Fruits and Vegetables",
+    "Lime": "Fruits and Vegetables",
+    "Apple": "Fruits and Vegetables",
+    "Carrot": "Fruits and Vegetables",
+    "Banana": "Fruits and Vegetables",
+    "Apricot": "Fruits and Vegetables",
+    "Pineapple": "Fruits and Vegetables",
+    "Cranberries": "Fruits and Vegetables",
+    "Exotic Fruits": "Fruits and Vegetables",
+    "Kiwi": "Fruits and Vegetables",
+    "Grapes": "Fruits and Vegetables",
+
+
+
+    # Garnishes & Botanicals
+    "Herbs and Spices": "Garnishes",
+    "Garnish": "Garnishes",
+    "Nuts": "Garnishes",
+    "Fruit": "Garnishes",
+    "Cherry": "Garnishes",
+
+
+    # catch‐all
+    None: "Other"
 }
 
 SYNONYMS = { raw.strip().lower(): canon for raw, canon in original_data.items() }
