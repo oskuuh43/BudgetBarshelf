@@ -12,7 +12,7 @@ class RumRatingsWindow(QWidget):
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Rum Ratings from the Rum Howler Blog")
-        self.resize(1100, 700)
+        self.resize(1200, 800)
         self.current_theme = theme
         self.layout = QVBoxLayout(self)
 

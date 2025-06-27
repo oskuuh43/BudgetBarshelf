@@ -21,7 +21,7 @@ class CocktailsWindow(QWidget):
         self.current_theme = theme
         # Window title and size
         self.setWindowTitle("Cocktail List")
-        self.resize(1000, 800)
+        self.resize(1100, 900)
 
         # Load data
         if not os.path.exists(csv_path):

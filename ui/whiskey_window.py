@@ -12,7 +12,7 @@ class WhiskeyRatingsWindow(QWidget):
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Whiskey Ratings from WhiskyScores")
-        self.resize(1100, 700)
+        self.resize(1300, 800)
         self.current_theme = theme
 
         self.layout = QVBoxLayout(self)
@@ -40,9 +40,9 @@ class WhiskeyRatingsWindow(QWidget):
         self.layout.addWidget(info_label)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(7)
+        self.table.setColumnCount(8)
         self.table.setHorizontalHeaderLabels([
-            "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)", "Review Count"
+            "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)", "Review Count", "Source"
         ])
         self.table.setAlternatingRowColors(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -117,20 +117,31 @@ class WhiskeyRatingsWindow(QWidget):
         # Match and assign scores using Fuzzymatch
         scores = []
         review_counts = []
+        sources = []
         for name in whiskey_df["Tuotenimi_clean"]:
             match = process.extractOne(name, ratings_df["Whiskey_clean"], scorer=fuzz.token_sort_ratio)
-            if match and match[1] >= 75:  # Lowered from 90 to 75
+            if match and match[1] >= 75:
                 matched_row = ratings_df[ratings_df["Whiskey_clean"] == match[0]]
                 score = matched_row["Score"].values[0]
                 count = matched_row["ReviewCount"].values[0]
+                # FIXED: Reliable fallback to check for actual column name
+                if "Website" in matched_row.columns:
+                    source = matched_row["Website"].values[0]
+                elif "Source" in matched_row.columns:
+                    source = matched_row["Source"].values[0]
+                else:
+                    source = ""
             else:
                 score = None
                 count = None
+                source = ""
             scores.append(score)
             review_counts.append(count)
+            sources.append(source)
 
         whiskey_df["Rating"] = scores
         whiskey_df["ReviewCount"] = review_counts
+        whiskey_df["Source"] = sources
 
         # Populate the table
         self.table.setRowCount(len(whiskey_df))
@@ -142,6 +153,7 @@ class WhiskeyRatingsWindow(QWidget):
             self.table.setItem(row, 4, QTableWidgetItem(f"{product['AlcoholPerEuro']:.4f}"))
             self.table.setItem(row, 5, QTableWidgetItem("" if pd.isna(product["Rating"]) else str(product["Rating"])))
             self.table.setItem(row, 6, QTableWidgetItem("" if pd.isna(product["ReviewCount"]) else str(product["ReviewCount"])))
+            self.table.setItem(row, 7, QTableWidgetItem("" if pd.isna(product["Source"]) else str(product["Source"])))
 
-            for col in range(7):
+            for col in range(8):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)

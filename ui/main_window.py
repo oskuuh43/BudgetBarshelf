@@ -21,7 +21,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.current_theme = initial_theme      # Darkmode/lightmode
         self.setWindowTitle("Alcohol per Euro Calculator")    # Main Window Title
-        self.resize(1100, 700)      # Initial size of main window
+        self.resize(1200, 800)      # Initial size of main window
 
         # Global layout for main window
         self.layout = QVBoxLayout(self)
