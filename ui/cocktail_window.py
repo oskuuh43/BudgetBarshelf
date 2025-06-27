@@ -186,6 +186,7 @@ class CocktailsWindow(QWidget):
     def apply_table_stylesheet(self):
         """Apply light/dark theme CSS to table."""
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
+        self.search_input.setStyleSheet(get_search_input_stylesheet(self.current_theme))
 
     def open_detail(self, row, _col):
         """On double-click, open a detail window for cocktail."""
