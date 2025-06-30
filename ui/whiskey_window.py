@@ -1,18 +1,23 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
 from utils.style_manager import get_table_stylesheet
 import pandas as pd
 import os
+import json
 from rapidfuzz import process, fuzz
+from pathlib import Path
+from ui.userWhiskeyRatingWindow import UserWhiskeyRatingsWindow
+
+USER_RATING_FILE = Path.home() / ".alko_user_whiskey_ratings.json"
 
 class WhiskeyRatingsWindow(QWidget):
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Whiskey Ratings from WhiskyScores")
-        self.resize(1300, 800)
+        self.resize(1400, 800)
         self.current_theme = theme
 
         self.layout = QVBoxLayout(self)
@@ -23,6 +28,10 @@ class WhiskeyRatingsWindow(QWidget):
             "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
         self.theme_button.clicked.connect(self.toggle_theme)
         self.layout.addWidget(self.theme_button)
+
+        self.btn_user_rating = QPushButton("Rate Whiskeys Yourself")
+        self.btn_user_rating.clicked.connect(self.open_user_rating_window)
+        self.layout.addWidget(self.btn_user_rating)
 
         title_label = QLabel("Whiskey Ratings from WhiskyScores")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
@@ -40,21 +49,33 @@ class WhiskeyRatingsWindow(QWidget):
         self.layout.addWidget(info_label)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(8)
+        self.table.setColumnCount(9)
         self.table.setHorizontalHeaderLabels([
-            "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)", "Review Count", "Source"
+            "Product Name", "Price (€)", "Alcohol (%)", "Size (L)", "Alcohol per €", "Rating (0-100)", "Review Count","My Rating", "Source"
         ])
         self.table.setAlternatingRowColors(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
 
-
-
         self.apply_table_stylesheet()
         self.load_data(alko_df)
+        QTimer.singleShot(0, self.adjust_column_widths)
+        self.alko_df = alko_df
 
     def apply_table_stylesheet(self):
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.adjust_column_widths()
+
+    def adjust_column_widths(self):
+        column_weights = [20, 10, 10, 10, 10.5, 10, 10, 10, 15]
+        total_weight = sum(column_weights)
+        table_width = self.table.viewport().width()
+        for i, weight in enumerate(column_weights):
+            self.table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeMode.Interactive)
+            self.table.setColumnWidth(i, int((weight / total_weight) * table_width))
 
     def toggle_theme(self):
         """
@@ -92,6 +113,13 @@ class WhiskeyRatingsWindow(QWidget):
             return
 
         ratings_df = pd.read_excel(ratings_path)
+
+        # Load user ratings
+        if USER_RATING_FILE.exists():
+            with open(USER_RATING_FILE, "r", encoding="utf-8") as f:
+                user_ratings = json.load(f)
+        else:
+            user_ratings = {}
 
         # Clean and simplify whiskey names
         ratings_df["Whiskey_clean"] = (
@@ -142,6 +170,8 @@ class WhiskeyRatingsWindow(QWidget):
         whiskey_df["Rating"] = scores
         whiskey_df["ReviewCount"] = review_counts
         whiskey_df["Source"] = sources
+        # Fill all matching names with the same rating
+        whiskey_df["MyRating"] = whiskey_df["Tuotenimi"].apply(lambda name: user_ratings.get(name, ""))
 
         # Populate the table
         self.table.setRowCount(len(whiskey_df))
@@ -153,7 +183,16 @@ class WhiskeyRatingsWindow(QWidget):
             self.table.setItem(row, 4, QTableWidgetItem(f"{product['AlcoholPerEuro']:.4f}"))
             self.table.setItem(row, 5, QTableWidgetItem("" if pd.isna(product["Rating"]) else str(product["Rating"])))
             self.table.setItem(row, 6, QTableWidgetItem("" if pd.isna(product["ReviewCount"]) else str(product["ReviewCount"])))
-            self.table.setItem(row, 7, QTableWidgetItem("" if pd.isna(product["Source"]) else str(product["Source"])))
+            self.table.setItem(row, 7, QTableWidgetItem(str(product["MyRating"])))
+            self.table.setItem(row, 8, QTableWidgetItem("" if pd.isna(product["Source"]) else str(product["Source"])))
 
-            for col in range(8):
+            for col in range(9):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def open_user_rating_window(self):
+        product_names = [self.table.item(row, 0).text() for row in range(self.table.rowCount())]
+        unique_names = sorted(set(product_names))  # Remove duplicates
+        self.rating_window = UserWhiskeyRatingsWindow(unique_names, USER_RATING_FILE)
+        self.rating_window.saved.connect(lambda: self.load_data(self.alko_df))
+        self.rating_window.show()
+
