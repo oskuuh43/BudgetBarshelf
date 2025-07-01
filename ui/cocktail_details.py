@@ -6,9 +6,8 @@ import requests
 
 
 class CocktailDetailWindow(QWidget):
-    def __init__(self, cocktail_data: pd.Series, theme="light"):
+    def __init__(self, cocktail_data: pd.Series):
         super().__init__()
-        self.current_theme = theme
         self.setWindowTitle(cocktail_data.get("strDrink", "Cocktail"))  # Set the window title to the cocktail’s name
         self.resize(600, 800)   # Window Size
 

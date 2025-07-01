@@ -158,8 +158,8 @@ class RumRatingsWindow(QWidget):
     def open_user_rating_window(self):
         product_names = [self.table.item(row, 0).text() for row in range(self.table.rowCount())]
         unique_names = sorted(set(product_names))
-        self.rating_window = UserRumRatingWindow(unique_names, USER_RUM_RATING_FILE)
-        self.rating_window.saved.connect(lambda: self.load_data(self.alko_df))
+        self.rating_window = UserRumRatingWindow(unique_names, USER_RUM_RATING_FILE, self.current_theme)
+        self.rating_window.saved.connect(lambda: (self.load_data(self.alko_df), QTimer.singleShot(0, self.adjust_column_widths)))
         self.rating_window.show()
 
     def resizeEvent(self, event):

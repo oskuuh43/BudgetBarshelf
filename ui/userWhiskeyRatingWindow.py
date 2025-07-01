@@ -6,16 +6,24 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QFont
+from utils.style_manager import get_search_input_stylesheet
 
+"""
+userWhiskeyRatingWindow.py
+
+Popup window that allows users to input their own ratings for whiskeys.
+Results are saved in a local JSON file and reloaded in the main app.
+"""
 
 class UserWhiskeyRatingsWindow(QWidget):
-    saved = pyqtSignal()
+    saved = pyqtSignal()    # Notify other windows when user ratings are saved
 
-    def __init__(self, product_names: list[str], config_path: Path):
+    def __init__(self, product_names: list[str], config_path: Path, theme = "light"):
         super().__init__()
         self.setWindowTitle("Rate Whiskeys Yourself")
         self.resize(500, 600)
         self.config_path = config_path
+        self.current_theme = theme
         self.all_product_names = sorted(product_names)
 
         # Load existing user ratings
@@ -53,9 +61,13 @@ class UserWhiskeyRatingsWindow(QWidget):
         btns.addWidget(btn_save)
         btns.addWidget(btn_cancel)
         self.layout.addLayout(btns)
+        self.apply_table_stylesheet()
 
     def populate_fields(self, filtered_names: list[str]):
-        # Clear layout
+        """
+        Display input fields for the given filtered product names.
+        Clears and repopulates the scroll layout.
+        """
         for i in reversed(range(self.scroll_layout.count())):
             widget = self.scroll_layout.itemAt(i).widget()
             if widget:
@@ -75,6 +87,9 @@ class UserWhiskeyRatingsWindow(QWidget):
             self.fields[name] = field
 
     def filter_products(self, text: str):
+        """
+        Filters the displayed product list based on user search input.
+        """
         query = text.strip().lower()
         if not query:
             filtered = self.all_product_names
@@ -82,8 +97,19 @@ class UserWhiskeyRatingsWindow(QWidget):
             filtered = [name for name in self.all_product_names if query in name.lower()]
         self.populate_fields(filtered)
 
+    def apply_table_stylesheet(self):
+        """
+        Apply styling for theme (light/dark).
+        """
+        self.search_bar.setStyleSheet(get_search_input_stylesheet(self.current_theme))
+        for field in self.fields.values():
+            field.setStyleSheet(get_search_input_stylesheet(self.current_theme))
+
     def _save_and_close(self):
-        # Start with existing ratings
+        """
+        Save user ratings to file and close the window.
+        Emits signal to update the main whiskey window.
+        """
         updated_ratings = self.saved_ratings.copy()
 
         # Update only the visible ratings

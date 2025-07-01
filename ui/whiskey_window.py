@@ -192,7 +192,7 @@ class WhiskeyRatingsWindow(QWidget):
     def open_user_rating_window(self):
         product_names = [self.table.item(row, 0).text() for row in range(self.table.rowCount())]
         unique_names = sorted(set(product_names))  # Remove duplicates
-        self.rating_window = UserWhiskeyRatingsWindow(unique_names, USER_RATING_FILE)
+        self.rating_window = UserWhiskeyRatingsWindow(unique_names, USER_RATING_FILE, self.current_theme)
         self.rating_window.saved.connect(lambda: self.load_data(self.alko_df))
         self.rating_window.show()
 

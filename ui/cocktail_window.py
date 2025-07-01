@@ -191,7 +191,7 @@ class CocktailsWindow(QWidget):
     def open_detail(self, row, _col):
         """On double-click, open a detail window for cocktail."""
         data = self.df_current.iloc[row]
-        self.detail_window = CocktailDetailWindow(data, self.current_theme)
+        self.detail_window = CocktailDetailWindow(data)
         self.detail_window.show()
 
     def open_barshelf(self):
