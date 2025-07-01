@@ -15,6 +15,9 @@ from utils.ingredients_mapper import normalize_ingredient, FAMILY_OF
 
 CONFIG_PATH = Path.home() / ".alko_app_shelf.json"
 
+
+# TODO: Add info about the cocktail dataset
+
 class CocktailsWindow(QWidget):
     def __init__(self, csv_path: str, theme="light"):
         super().__init__()
