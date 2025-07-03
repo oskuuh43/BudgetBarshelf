@@ -22,26 +22,15 @@ class WhiskeyRatingsWindow(QWidget):
 
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
-        """
-        # Theme toggle button
-        self.theme_button = QPushButton(
-            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
-        self.theme_button.clicked.connect(self.toggle_theme)
-        self.layout.addWidget(self.theme_button)
 
-        self.btn_user_rating = QPushButton("Rate Whiskeys Yourself")
-        self.btn_user_rating.clicked.connect(self.open_user_rating_window)
-        self.layout.addWidget(self.btn_user_rating)
-        """
         title_label = QLabel("Whiskey Ratings from WhiskyScores")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(title_label)
 
         info_label = QLabel(
-            "The whiskey ratings below are primarily scraped from WhiskyScores.com.\n"
-            "Additional ratings have been manually gathered from other whiskey rating sites.\n"
-            "Product names have been manually adjusted to better match Alko's naming conventions."
+            "The whiskey ratings below are primarily scraped from WhiskyScores.com. Additional ratings have been manually gathered from other whiskey rating sites.\n"   
+            "Product names have been manually adjusted to better match Alko's product naming conventions."
         )
         info_label.setWordWrap(True)
         info_label.setFont(QFont("Arial", 10))

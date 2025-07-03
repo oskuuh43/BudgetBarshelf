@@ -53,7 +53,7 @@ class CocktailsWindow(QWidget):
 
         info_label = QLabel(
             "Browse a wide selection of cocktails and see what you can make with the ingredients in your bar.\n"
-            "You can filter by name or ingredients, and click on a drink to view full details and recipe steps.?\n"
+            "You can filter by name or ingredients, and click on a drink to view full details and recipe steps."
         )
         info_label.setFont(QFont("Arial", 10))
         info_label.setWordWrap(True)
