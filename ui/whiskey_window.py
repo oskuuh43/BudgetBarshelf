@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication, QHBoxLayout
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 from utils.dark_theme import create_dark_palette
@@ -22,7 +22,7 @@ class WhiskeyRatingsWindow(QWidget):
 
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
-
+        """
         # Theme toggle button
         self.theme_button = QPushButton(
             "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
@@ -32,7 +32,7 @@ class WhiskeyRatingsWindow(QWidget):
         self.btn_user_rating = QPushButton("Rate Whiskeys Yourself")
         self.btn_user_rating.clicked.connect(self.open_user_rating_window)
         self.layout.addWidget(self.btn_user_rating)
-
+        """
         title_label = QLabel("Whiskey Ratings from WhiskyScores")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -47,6 +47,22 @@ class WhiskeyRatingsWindow(QWidget):
         info_label.setFont(QFont("Arial", 10))
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(info_label)
+
+        # Buttons row
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.theme_button = QPushButton(
+            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        button_layout.addWidget(self.theme_button)
+
+        self.btn_user_rating = QPushButton("Rate Whiskeys Yourself")
+        self.btn_user_rating.clicked.connect(self.open_user_rating_window)
+        button_layout.addWidget(self.btn_user_rating)
+
+        self.layout.addLayout(button_layout)
 
         self.table = QTableWidget()
         self.table.setColumnCount(9)
@@ -148,7 +164,7 @@ class WhiskeyRatingsWindow(QWidget):
         sources = []
         for name in whiskey_df["Tuotenimi_clean"]:
             match = process.extractOne(name, ratings_df["Whiskey_clean"], scorer=fuzz.token_sort_ratio)
-            if match and match[1] >= 75:
+            if match and match[1] >= 85:
                 matched_row = ratings_df[ratings_df["Whiskey_clean"] == match[0]]
                 score = matched_row["Score"].values[0]
                 count = matched_row["ReviewCount"].values[0]

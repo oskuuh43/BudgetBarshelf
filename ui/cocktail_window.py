@@ -7,16 +7,13 @@ from PyQt6.QtWidgets import (
     QHeaderView, QMessageBox, QLineEdit, QLabel, QHBoxLayout, QComboBox, QPushButton
 )
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QStandardItemModel, QStandardItem
+from PyQt6.QtGui import QStandardItemModel, QStandardItem, QFont
 from utils.style_manager import get_table_stylesheet, get_search_input_stylesheet
 from ui.cocktail_details import CocktailDetailWindow
 from ui.barshelf_window import BarShelfWindow
 from utils.ingredients_mapper import normalize_ingredient, FAMILY_OF
 
 CONFIG_PATH = Path.home() / ".alko_app_shelf.json"
-
-
-# TODO: Add info about the cocktail dataset
 
 class CocktailsWindow(QWidget):
     def __init__(self, csv_path: str, theme="light"):
@@ -47,6 +44,21 @@ class CocktailsWindow(QWidget):
         # LAYOUT SETUP
         layout = QVBoxLayout(self)
         self.setLayout(layout)
+
+        # Title and information
+        title_label = QLabel("Cocktail Recipes and Barshelf Manager")
+        title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title_label)
+
+        info_label = QLabel(
+            "Browse a wide selection of cocktails and see what you can make with the ingredients in your bar.\n"
+            "You can filter by name or ingredients, and click on a drink to view full details and recipe steps.?\n"
+        )
+        info_label.setFont(QFont("Arial", 10))
+        info_label.setWordWrap(True)
+        info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(info_label)
 
         # search + buttons row
         search_layout = QHBoxLayout()

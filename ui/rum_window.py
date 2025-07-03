@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QPushButton, QApplication, QHBoxLayout
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 from utils.dark_theme import create_dark_palette
@@ -22,15 +22,6 @@ class RumRatingsWindow(QWidget):
         self.layout = QVBoxLayout(self)
         self.alko_df = alko_df
 
-        # Theme toggle button (darkmode/lightmode)
-        self.theme_button = QPushButton(
-            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
-        self.theme_button.clicked.connect(self.toggle_theme)
-        self.layout.addWidget(self.theme_button)
-
-        self.btn_user_rating = QPushButton("Rate Rums Yourself")
-        self.btn_user_rating.clicked.connect(self.open_user_rating_window)
-        self.layout.addWidget(self.btn_user_rating)
 
         # Title label + info
         title_label = QLabel("Rum Ratings from the Rum Howler Blog")
@@ -39,13 +30,30 @@ class RumRatingsWindow(QWidget):
         self.layout.addWidget(title_label)
 
         info_label = QLabel(
-            "The rum ratings below are scraped from the Rum Howler Blog (therumhowlerblog.com).\n"
+            "The rum ratings below are primarily scraped from the Rum Howler Blog (therumhowlerblog.com).\n"
+            "Additional ratings have been manually gathered from other rum rating sites.\n"
             "Product names have been manually adjusted after scraping to better match Alko's naming."
         )
         info_label.setWordWrap(True)
         info_label.setFont(QFont("Arial", 10))
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(info_label)
+
+        # Buttons row
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.theme_button = QPushButton(
+            "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        button_layout.addWidget(self.theme_button)
+
+        self.btn_user_rating = QPushButton("Rate Rums Yourself")
+        self.btn_user_rating.clicked.connect(self.open_user_rating_window)
+        button_layout.addWidget(self.btn_user_rating)
+
+        self.layout.addLayout(button_layout)
 
         self.table = QTableWidget()
         self.table.setAlternatingRowColors(True)
