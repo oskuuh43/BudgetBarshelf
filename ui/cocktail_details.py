@@ -7,23 +7,28 @@ import requests
 
 class CocktailDetailWindow(QWidget):
     def __init__(self, cocktail_data: pd.Series):
+        """
+        Displays the full details of a cocktail: image, ingredients, and instructions.
+        """
         super().__init__()
         self.setWindowTitle(cocktail_data.get("strDrink", "Cocktail"))  # Set the window title to the cocktail’s name
         self.resize(600, 800)   # Window Size
 
-        # Main layout for image + ingredients + instructions
+        # Main layout
         layout = QVBoxLayout(self)
         self.setLayout(layout)
 
-        # IMAGE AT TOP OF PAGE
+        # Load cocktail image from URL if available
         thumb = cocktail_data.get("strDrinkThumb", "")
         if isinstance(thumb, str) and thumb.startswith("http"):
             try:
-                # Fetch the Image
+                # Attempt to download the image
                 resp = requests.get(thumb, timeout=5)
                 resp.raise_for_status()
                 pix = QPixmap()
                 pix.loadFromData(resp.content)
+
+                # Display the image in a QLabel
                 img_label = QLabel()
                 img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 # Scale to width 300px
@@ -45,7 +50,7 @@ class CocktailDetailWindow(QWidget):
             no_img.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(no_img)
 
-        # INGREDIENTS FIELD
+        # INGREDIENT LIST
         ingredients = []
         # Build a list of measures and ingredients
         for i in range(1, 16):
@@ -57,11 +62,11 @@ class CocktailDetailWindow(QWidget):
                 else:
                     ingredients.append(ing.strip())
 
+        # Display ingredients as a read-only text box
         layout.addWidget(QLabel("Ingredients:"))
-        # Use QTextEdit to show info
         ing_text = QTextEdit("\n".join(ingredients))
         ing_text.setReadOnly(True)
-        ing_text.setFixedHeight(min(len(ingredients) * 24 + 10, 200))
+        ing_text.setFixedHeight(min(len(ingredients) * 24 + 10, 200))   # Adjust height based on list size
         layout.addWidget(ing_text)
 
         # INSTRUCTIONS FIELD
@@ -70,7 +75,7 @@ class CocktailDetailWindow(QWidget):
         instr_edit = QTextEdit(instr)
         instr_edit.setReadOnly(True)
 
-        # Wrap the instructions in a scroll area.
+        # Scroll area for instructions
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(instr_edit)

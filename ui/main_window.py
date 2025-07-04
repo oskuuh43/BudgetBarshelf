@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem, QHeaderView, QMessageBox, QComboBox, QLabel, QLineEdit, QApplication
 )
 import os
+import sys
+from pathlib import Path
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from data.data_handler import fetch_and_process_data
@@ -14,9 +16,16 @@ from utils.dark_theme import create_dark_palette
 from utils.light_theme import create_light_palette
 from utils.style_manager import get_table_stylesheet, get_dropdown_stylesheet, get_search_input_stylesheet
 
-
+def get_assets_path():
+    # Return correct path to 'assets' directory
+    # - In .exe mode: use the unpacked PyInstaller directory
+    # - In dev (when run from project): return absolute path to project-local folder
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, 'assets')
+    return os.path.abspath('assets')
 
 class MainWindow(QWidget):
+    """Main window for viewing alcohol products and launching other windows."""
     def __init__(self, initial_theme="light"):
         super().__init__()
         self.current_theme = initial_theme      # Darkmode/lightmode
@@ -88,6 +97,7 @@ class MainWindow(QWidget):
         self.whiskey_ratings_button.clicked.connect(self.open_whiskey_window)
         controls_layout.addWidget(self.whiskey_ratings_button)
 
+        # Cocktails Window Button
         self.cocktails_button = QPushButton("View Cocktails")
         self.cocktails_button.setEnabled(False)
         self.cocktails_button.clicked.connect(self.open_cocktails_window)
@@ -107,18 +117,18 @@ class MainWindow(QWidget):
         self.apply_table_stylesheet()
 
     def open_rum_window(self):
-        # Instantiate rum window with same dataset and theme (darkmode/lightmode)
+        # Open rum window with same dataset and theme (darkmode/lightmode)
             self.rum_window = RumRatingsWindow(self.df_all, self.current_theme)
             self.rum_window.show()
 
     def open_whiskey_window(self):
-        # Instantiate whiskey window with same dataset and theme (darkmode/lightmode)
+        # Open whiskey window with same dataset and theme (darkmode/lightmode)
             self.whiskey_window = WhiskeyRatingsWindow(self.df_all, self.current_theme)
             self.whiskey_window.show()
 
     def open_cocktails_window(self):
         try:
-            path = os.path.join("assets", "all_drinks_metric.csv")
+            path = os.path.join(get_assets_path(), "all_drinks_metric.csv")
             # pass along current_theme so the new window can pick it up
             self.cocktails_window = CocktailsWindow(path, self.current_theme)
             self.cocktails_window.show()
@@ -165,6 +175,7 @@ class MainWindow(QWidget):
 
 
     def apply_table_stylesheet(self):
+        """Applies theme-based (Light/Dark) stylesheets to controls."""
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
         self.category_dropdown.setStyleSheet(get_dropdown_stylesheet(self.current_theme))
         self.search_input.setStyleSheet(get_search_input_stylesheet(self.current_theme))

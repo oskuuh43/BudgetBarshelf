@@ -11,9 +11,22 @@ from ui.userRumRatingWindow import UserRumRatingWindow  # adjust path if needed
 from pathlib import Path
 import json
 
+# Path to ratings (stored in user's home directory)
 USER_RUM_RATING_FILE = Path.home() / ".alko_user_rum_ratings.json"
 
+def get_assets_path():
+    # Return correct path to 'assets' directory
+    # - In .exe mode: use the unpacked PyInstaller directory
+    # - In dev: return absolute path to project-local folder
+    import sys
+    import os
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, 'assets')
+    return os.path.abspath('assets')
+
+
 class RumRatingsWindow(QWidget):
+    """Window for displaying rum products with review data and user ratings."""
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Rum Ratings from the Rum Howler Blog")
@@ -29,6 +42,7 @@ class RumRatingsWindow(QWidget):
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(title_label)
 
+        # Info Text
         info_label = QLabel(
             "Browse and compare the Alko.fi websites rum products by value and product ratings. \n"
             "You can also add your own ratings to the rum products below."
@@ -43,26 +57,30 @@ class RumRatingsWindow(QWidget):
         button_layout.setSpacing(10)
         button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # Theme Toggle Button
         self.theme_button = QPushButton(
             "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
         self.theme_button.clicked.connect(self.toggle_theme)
         button_layout.addWidget(self.theme_button)
 
+        # Open user rating input window
         self.btn_user_rating = QPushButton("Rate Rums Yourself")
         self.btn_user_rating.clicked.connect(self.open_user_rating_window)
         button_layout.addWidget(self.btn_user_rating)
 
         self.layout.addLayout(button_layout)
 
+        # Product Table
         self.table = QTableWidget()
         self.table.setAlternatingRowColors(True)
         self.layout.addWidget(self.table)
 
         self.load_data(alko_df)     # Populate table with alko dataframe
-        QTimer.singleShot(0, self.adjust_column_widths)
+        QTimer.singleShot(0, self.adjust_column_widths) # delay resize
         self.apply_table_stylesheet()
 
     def apply_table_stylesheet(self):
+        """Apply theme-based stylesheet to the table."""
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
 
 
@@ -84,6 +102,7 @@ class RumRatingsWindow(QWidget):
 
         self.apply_table_stylesheet()
 
+        # Update all open windows with the new theme
         for w in QApplication.instance().topLevelWidgets():
             if w is self:
                 continue
@@ -99,7 +118,7 @@ class RumRatingsWindow(QWidget):
 
     def load_data(self, alko_df):
         # Load RumHowler ratings
-        ratings_path = os.path.join("assets", "rumhowler_data.xlsx")
+        ratings_path = os.path.join(get_assets_path(), "rumhowler_data.xlsx")
         if not os.path.exists(ratings_path):
             return
 
@@ -127,10 +146,12 @@ class RumRatingsWindow(QWidget):
             review_counts.append(count)
             sources.append(source)
 
+        # Append review info to Alko DataFrame
         rums_df["Rating"] = scores
         rums_df["ReviewCount"] = review_counts
         rums_df["Source"] = sources
 
+        # Load users own ratings
         if USER_RUM_RATING_FILE.exists():
             with open(USER_RUM_RATING_FILE, "r", encoding="utf-8") as f:
                 user_ratings = json.load(f)
@@ -163,6 +184,7 @@ class RumRatingsWindow(QWidget):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def open_user_rating_window(self):
+        """Open a window for entering personal rum ratings."""
         product_names = [self.table.item(row, 0).text() for row in range(self.table.rowCount())]
         unique_names = sorted(set(product_names))
         self.rating_window = UserRumRatingWindow(unique_names, USER_RUM_RATING_FILE, self.current_theme)
@@ -170,10 +192,12 @@ class RumRatingsWindow(QWidget):
         self.rating_window.show()
 
     def resizeEvent(self, event):
+        """Ensure columns are resized"""
         super().resizeEvent(event)
         self.adjust_column_widths()
 
     def adjust_column_widths(self):
+        """Resize columns proportionally based on weights. (name column wider than price etc.)"""
         column_weights = [20, 10, 10, 10, 10.5, 10, 10, 10, 15]
         total_weight = sum(column_weights)
         table_width = self.table.viewport().width()

@@ -1,5 +1,6 @@
 import os
 import json
+import sys
 from pathlib import Path
 import pandas as pd
 from PyQt6.QtWidgets import (
@@ -8,15 +9,25 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QFont
+
+# Styling and logic imports
 from utils.style_manager import get_table_stylesheet, get_search_input_stylesheet
 from ui.cocktail_details import CocktailDetailWindow
 from ui.barshelf_window import BarShelfWindow
 from utils.ingredients_mapper import normalize_ingredient, FAMILY_OF
 
+# Path to saved ingredients file (users bar shelf)
 CONFIG_PATH = Path.home() / ".alko_app_shelf.json"
+
+def get_assets_path():
+    """Returns correct path to the assets/ folder depending on if we're in PyInstaller or dev mode."""
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, 'assets') # When bundled
+    return os.path.abspath('assets')    # In development (run from code)
 
 class CocktailsWindow(QWidget):
     def __init__(self, csv_path: str, theme="light"):
+        """Initializes the cocktail window with the given dataset path and theme."""
         super().__init__()
         self.current_theme = theme
         # Window title and size
@@ -26,7 +37,8 @@ class CocktailsWindow(QWidget):
         # Load data
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"CSV not found: {csv_path}")
-        self.df_all = pd.read_csv(csv_path) # Read CSV into pandas
+        full_path = os.path.join(get_assets_path(), csv_path) if not os.path.isabs(csv_path) else csv_path
+        self.df_all = pd.read_csv(full_path)
 
         # Build ingredient list for each row
         def make_ing_list(row):
@@ -38,8 +50,7 @@ class CocktailsWindow(QWidget):
             return out
 
         self.df_all["ingredients_list"] = self.df_all.apply(make_ing_list, axis=1)
-        # df_current holds whatever subset we are showing
-        self.df_current = self.df_all.copy()
+        self.df_current = self.df_all.copy()    # df_current will be filtered version
 
         # LAYOUT SETUP
         layout = QVBoxLayout(self)
@@ -86,7 +97,7 @@ class CocktailsWindow(QWidget):
 
         layout.addLayout(search_layout)
 
-        # 3-column list: Category, Name, Ingredients
+        # 3-column list: Category, Name, Ingredients (Cocktail table)
         self.table = QTableWidget()
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["Drink Type", "Name", "Ingredients"])
@@ -128,7 +139,7 @@ class CocktailsWindow(QWidget):
                 header = QStandardItem(f"— {fam} —")
                 header.setFlags(Qt.ItemFlag.NoItemFlags)
                 model.appendRow(header)
-                # then each ingredient under that family
+                # each ingredient under that family
                 for ing in sorted(groups[fam]):
                     item = QStandardItem(ing)
                     item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
@@ -142,13 +153,14 @@ class CocktailsWindow(QWidget):
 
         # Populate Table
         self.apply_filters()  # will populate self.df_current
+        self.apply_table_stylesheet()
 
         # Double-click a row to open details
-        self.apply_table_stylesheet()
         self.table.cellDoubleClicked.connect(self.open_detail)
 
 
     def apply_filters(self):
+        """Apply both name and ingredient filters."""
         term = self.search_input.text().strip().lower()
 
         # 1) Name filter (case-insensitive substring match)

@@ -6,28 +6,46 @@ from utils.light_theme import create_light_palette
 from utils.style_manager import get_table_stylesheet
 import pandas as pd
 import os
+import sys
 import json
 from rapidfuzz import process, fuzz
 from pathlib import Path
 from ui.userWhiskeyRatingWindow import UserWhiskeyRatingsWindow
 
+# Path to user rating storage (stored in user's home directory)
 USER_RATING_FILE = Path.home() / ".alko_user_whiskey_ratings.json"
 
+def get_assets_path():
+    # Return correct path to 'assets' directory
+    # - In .exe mode: use the unpacked PyInstaller directory
+    # - In dev: return absolute path to project-local folder
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, 'assets')
+    return os.path.abspath('assets')
+
+
 class WhiskeyRatingsWindow(QWidget):
+    """
+    A window that displays whiskey products from Alko.fi and combines them with review data
+    scraped from whiskey rating sites. Users can also assign and store personal ratings.
+    """
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
         self.setWindowTitle("Whiskey Ratings from WhiskyScores")
         self.resize(1400, 800)
         self.current_theme = theme
 
+        # Main layout for the entire window
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 
+        # Title Section
         title_label = QLabel("Whiskey Ratings from WhiskyScores")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(title_label)
 
+        # Info Section
         info_label = QLabel(
             "Compare the Alko.fi websites whiskey products by value and product ratings.\n"
             "You can also assign your own ratings to the whiskey products below."
@@ -42,17 +60,20 @@ class WhiskeyRatingsWindow(QWidget):
         button_layout.setSpacing(10)
         button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # Theme toggle button
         self.theme_button = QPushButton(
             "Switch to Dark Mode" if self.current_theme == "light" else "Switch to Light Mode")
         self.theme_button.clicked.connect(self.toggle_theme)
         button_layout.addWidget(self.theme_button)
 
+        # Button to launch user rating input dialog
         self.btn_user_rating = QPushButton("Rate Whiskeys Yourself")
         self.btn_user_rating.clicked.connect(self.open_user_rating_window)
         button_layout.addWidget(self.btn_user_rating)
 
         self.layout.addLayout(button_layout)
 
+        # Table Setup
         self.table = QTableWidget()
         self.table.setColumnCount(9)
         self.table.setHorizontalHeaderLabels([
@@ -68,13 +89,16 @@ class WhiskeyRatingsWindow(QWidget):
         self.alko_df = alko_df
 
     def apply_table_stylesheet(self):
+        """Apply the current theme to the table."""
         self.table.setStyleSheet(get_table_stylesheet(self.current_theme))
 
     def resizeEvent(self, event):
+        """Handle window resize event to keep table columns proportional."""
         super().resizeEvent(event)
         self.adjust_column_widths()
 
     def adjust_column_widths(self):
+        """Dynamically resize columns based on relative weights."""
         column_weights = [20, 10, 10, 10, 10.5, 10, 10, 10, 15]
         total_weight = sum(column_weights)
         table_width = self.table.viewport().width()
@@ -113,7 +137,11 @@ class WhiskeyRatingsWindow(QWidget):
                         w.theme_button.setText("Switch to Dark Mode")
 
     def load_data(self, alko_df):
-        ratings_path = os.path.join("assets", "whiskey_scores_data.xlsx")
+        """
+        Load whiskey ratings from an Excel file and match them with Alko products
+        using fuzzy name matching. User ratings are also loaded.
+        """
+        ratings_path = os.path.join(get_assets_path(), "whiskey_scores_data.xlsx")
         if not os.path.exists(ratings_path):
             return
 
@@ -172,6 +200,7 @@ class WhiskeyRatingsWindow(QWidget):
             review_counts.append(count)
             sources.append(source)
 
+        # Add matched data to Alko table
         whiskey_df["Rating"] = scores
         whiskey_df["ReviewCount"] = review_counts
         whiskey_df["Source"] = sources
@@ -195,6 +224,7 @@ class WhiskeyRatingsWindow(QWidget):
                 self.table.item(row, col).setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def open_user_rating_window(self):
+        """Open dialog window for users to rate whiskey products manually."""
         product_names = [self.table.item(row, 0).text() for row in range(self.table.rowCount())]
         unique_names = sorted(set(product_names))  # Remove duplicates
         self.rating_window = UserWhiskeyRatingsWindow(unique_names, USER_RATING_FILE, self.current_theme)

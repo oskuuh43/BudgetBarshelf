@@ -1,7 +1,6 @@
 import json
 import os
 from pathlib import Path
-
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QScrollArea, QCheckBox,
     QPushButton, QHBoxLayout
@@ -13,6 +12,10 @@ class BarShelfWindow(QWidget):
     saved = pyqtSignal()
 
     def __init__(self, ingredients: list[str], config_path: Path):
+        """
+        Initializes the BarShelfWindow.
+        Allows the user to check/uncheck ingredients they have in their personal bar shelf.
+        """
         super().__init__()
         self.setWindowTitle("Manage My Bar Shelf")
         self.resize(400, 600)
@@ -49,13 +52,19 @@ class BarShelfWindow(QWidget):
         btns = QHBoxLayout()
         btn_save = QPushButton("Save")
         btn_cancel = QPushButton("Cancel")
+
+        # Connect button actions
         btn_save.clicked.connect(self._save_and_close)
         btn_cancel.clicked.connect(self.close)
+
         btns.addWidget(btn_save)
         btns.addWidget(btn_cancel)
         layout.addLayout(btns)
 
     def _save_and_close(self):
+        """
+        Save the checked ingredients to a JSON file, emit the saved signal, and close the window.
+        """
         # Gather the checked ingredients
         picked = [ing for ing, cb in self.checks.items() if cb.isChecked()]
 
