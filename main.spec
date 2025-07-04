@@ -1,11 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+block_cipher = None
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('assets/*.xlsx', 'assets'),
+        ('assets/*.csv', 'assets')
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -13,8 +17,10 @@ a = Analysis(
     excludes=[],
     noarchive=False,
     optimize=0,
+    cipher=block_cipher,
 )
-pyz = PYZ(a.pure)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
     pyz,
@@ -22,7 +28,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='main',
+    name='AlkoCalculator',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,4 +41,15 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='AlkoCalculator'
 )
