@@ -139,12 +139,15 @@ class MainWindow(QWidget):
         - Error if data fetch fails
         """
         try:
-            df = fetch_and_process_data()   # Download and process the data
-            self.df_all = df    # Save dataset to memory
+            df, used_backup = fetch_and_process_data()
+            self.df_all = df
 
-            self.updated_label.setText(
-                f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-            )
+            if used_backup:
+                self.updated_label.setText("Using backup Alko dataset – latest fetch failed.")
+            else:
+                self.updated_label.setText(
+                    f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                )
 
             # Extract categories and add to dropdown
             categories = ["All"] + sorted(df["Tyyppi"].dropna().unique().tolist())

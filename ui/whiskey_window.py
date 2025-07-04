@@ -29,8 +29,8 @@ class WhiskeyRatingsWindow(QWidget):
         self.layout.addWidget(title_label)
 
         info_label = QLabel(
-            "The whiskey ratings below are primarily scraped from WhiskyScores.com. Additional ratings have been manually gathered from other whiskey rating sites.\n"   
-            "Product names have been manually adjusted to better match Alko's product naming conventions."
+            "Compare the Alko.fi websites whiskey products by value and product ratings.\n"
+            "You can also assign your own ratings to the whiskey products below."
         )
         info_label.setWordWrap(True)
         info_label.setFont(QFont("Arial", 10))

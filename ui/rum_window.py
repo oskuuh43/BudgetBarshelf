@@ -30,8 +30,8 @@ class RumRatingsWindow(QWidget):
         self.layout.addWidget(title_label)
 
         info_label = QLabel(
-            "The rum ratings below are primarily scraped from the Rum Howler Blog (therumhowlerblog.com). Additional ratings have been manually gathered from other rum rating sites.\n"
-            "Product names have been manually adjusted after scraping to better match Alko's product naming."
+            "Browse and compare the Alko.fi websites rum products by value and product ratings. \n"
+            "You can also add your own ratings to the rum products below."
         )
         info_label.setWordWrap(True)
         info_label.setFont(QFont("Arial", 10))
