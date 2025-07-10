@@ -3,8 +3,7 @@
 ## Overview
 
 **alko_app** is a desktop application designed to help users compare alcoholic beverages sold by the Finnish state-owned liquor store, **Alko**.
-The application provides an "all in one" platform for browsing products by value, community ratings, and ingredient usability in cocktails.
-
+The application provides an "all in one" platform for browsing products by value and community ratings, with the added functionality of working as a "cocktail guide", helping you discover cocktails to make with the ingredients you have at home.
 
 ## Features
 
