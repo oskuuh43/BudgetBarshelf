@@ -95,23 +95,150 @@ Detailed instructions for making the cocktails.
 ##  How To run
 
 ### Option 1: Run the Executable (.exe)
-Explain how to launch it and what files are needed.
 
-### Option 2: Developer Setup
-Include steps to clone, install requirements, and run with Python.
+If you just want to use the app without installing Python or dependencies:
+
+1. **Download the latest release** from the GitHub Releases page:  
+    [https://github.com/oskuuh43/alko_app/releases](https://github.com/oskuuh43/alko_app/releases)  -- add correct link --
+
+2. **Unzip** the downloaded `.zip` file.
+
+3. Inside the extracted folder, you’ll find:
+   - `alko_app.exe` – the application executable
+   - `_internal/` – required folder containing Excel files and other resources
+
+4. **Double-click** `alko_app.exe` to launch the app.
+
+No further installation is needed.
+
+
+### Option 2: Run from the Code
+
+If you want to run or modify the code yourself:
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/oskuuh43/alko_app.git
+   cd alko_app
+
+2. **Install the required dependencies**:
+
+   ```bash
+   pip install -r requirements.txt
+
+3. **Run The Application**:
+   
+   ```bash
+   python main.py
+
+Make sure the assets/ folder is present in the project root. It contains all required datasets.
 
 
 ## Project Structure
-Explain the folder layout briefly for developers.
 
-## Data Sources
-List where Alko, whiskey, and rum data come from (with links).
+The **project structure for the application** is the following:
+
+<img width="635" height="731" alt="image" src="https://github.com/user-attachments/assets/c42123d9-4764-466d-bea7-e843edfcd1d2" />
+
+## Sources
+
+The sources listed below are relied on for finding the needed information for this application:
+
+### Alko Product Data
+
+  [alkon-hinnasto-tekstitiedostona.xlsx](https://www.alko.fi/INTERSHOP/static/WFS/Alko-OnlineShop-Site/-/Alko-OnlineShop/fi_FI/Alkon%20Hinnasto%20Tekstitiedostona/alkon-hinnasto-tekstitiedostona.xlsx)
+
+### Rum Ratings
+
+- [The Rum Howler Blog](https://therumhowlerblog.com/) *(main source for ratings, scraped using a webscraper I Developed)*
+- [RumX](https://www.rum-x.com/)
+- [The Rum Barrel](https://therumbarrel.co.uk/)
+- [Master of Malt – Rum](https://www.masterofmalt.com/)
+- [Isokaato – Rum](https://www.isokaato.com/)
+- [Rhum Attitude](https://www.rhumattitude.com/en/)
+- [Excellence Rhum](https://www.excellencerhum.com/en/)
+- [Amazon UK – Rum reviews](https://www.amazon.co.uk/)
+- [Reddit r/rum](https://www.reddit.com/r/rum/)
+
+*The custom webscraper scraper will be linked here once published.*
+
+### Whiskey Ratings
+
+- [WhiskyScores.com](https://whiskyscores.com/) *(main source for ratings, scraped using a webscraper I Developed)*
+- [Whiskybase](https://www.whiskybase.com/)
+- [WhiskyRant](https://www.whiskyrant.com/)
+- [Minimiehen Seikkailut (FI)](https://minimiehenseikkailut.blogspot.com/)
+- [Distiller](https://distiller.com/)
+- [Film & Whiskey Podcast](https://www.filmwhiskey.com/)
+- [Liquor.com – Whiskey](https://www.liquor.com/)
+- [Breaking Bourbon](https://www.breakingbourbon.com/)
+- [Master of Malt – Whiskey](https://www.masterofmalt.com/)
+- Reddit communities:
+  - [r/bourbon](https://www.reddit.com/r/bourbon/)
+  - [r/irishwhiskey](https://www.reddit.com/r/irishwhiskey/)
+  - [r/worldwhisky](https://www.reddit.com/r/worldwhisky/)
+  - [r/Scotch](https://www.reddit.com/r/Scotch/)
+- [Dramface](https://www.dramface.com/)
+- [Sublime Imbibing](https://sublimeimbibing.ca/)
+- [Whiskey in My Wedding Ring](https://www.whiskeyinmyweddingring.com/)
+- [Words of Whisky](https://wordsofwhisky.com/)
+
+*The webscraper will be linked here once published.*
+
+### Cocktail Recipes
+
+- **Cocktail Ingredients Dataset (Kaggle)**  
+  [https://www.kaggle.com/datasets/ai-first/cocktail-ingredients](https://www.kaggle.com/datasets/ai-first/cocktail-ingredients)
+
+This dataset contains thousands of cocktail recipes.
+
+### Useful programming information
+
+- [PyQt6 Documentation](https://doc.qt.io/qtforpython-6/) – GUI design
+- [Pandas Documentation](https://pandas.pydata.org/docs/user_guide/index.html#user-guide) – Data handling
+- [PyInstaller](https://pyinstaller.org/en/stable/) – `.exe` packaging
 
 ## Where Data Is Stored
-Mention paths for user ratings and where the Alko data goes.
 
-## Requirements
-Dependencies and how to install them.
+The application stores data in different locations depending on the type of data and how the app is run (as a `.exe` or from the source code). 
+Below is an overview of where data is stored:
+
+### Alko Product Data
+
+- **Location (.exe):**  
+  `C:\Users\<YourUsername>\.alko_app\alko_price_list.xlsx`
+
+- **Location (Run from Source Code):**  
+  `assets/alko_price_list.xlsx`
+
+### User Ratings (Rum & Whiskey)
+
+- **Location (Both Executable and Source):**
+  
+  `C:\Users\<YourUsername>\.alko_user_whiskey_ratings.json`
+  
+  `C:\Users\<YourUsername>\.alko_user_rum_ratings.json`
+
+These files store your personal rum and whiskey ratings.
+
+### Bar Shelf Data
+
+- **Location (Both Executable and Source):**  
+  `C:\Users\<YourUsername>\.alko_app_shelf.json`
+
+This file contains the list of ingredients you've selected in the “Manage My Bar” window.
+
+### Static Resources (Cocktail Recipes, Review Datasets, etc.)
+
+- **Location (Development):**  
+  `assets/`
+
+- **Location (Executable):**  
+  `_internal/assets/`
+
+## Words from the creator
+...............
 
 
 
