@@ -160,8 +160,6 @@ The sources listed below are relied on for finding the needed information for th
 - [Amazon UK – Rum reviews](https://www.amazon.co.uk/)
 - [Reddit r/rum](https://www.reddit.com/r/rum/)
 
-*The custom webscraper scraper will be linked here once published.*
-
 ### Whiskey Ratings
 
 - [WhiskyScores.com](https://whiskyscores.com/) *(main source for ratings, scraped using a webscraper I Developed)*
@@ -183,7 +181,7 @@ The sources listed below are relied on for finding the needed information for th
 - [Whiskey in My Wedding Ring](https://www.whiskeyinmyweddingring.com/)
 - [Words of Whisky](https://wordsofwhisky.com/)
 
-*The webscraper will be linked here once published.*
+*Link to the webscraper used for gathering data*: [ AlkoReviewScraper ](https://github.com/oskuuh43/AlkoReviewScraper/tree/main)
 
 ### Cocktail Recipes
 
