@@ -98,15 +98,15 @@ Detailed instructions for making the cocktails.
 If you just want to use the app without installing Python or dependencies:
 
 1. **Download the latest release** from the GitHub Releases page:  
-    https://github.com/oskuuh43/alko_app/releases/tag/v1.0.0
+    https://github.com/oskuuh43/BudgetBarshelf/releases/tag/v1.0.0
 
 2. **Unzip** the downloaded `.zip` file.
 
 3. Inside the extracted folder, you’ll find:
-   - `alko_app.exe` – the application executable
+   - `AlkoCalculator.exe` – the application executable
    - `_internal/` – required folder containing Excel files and other resources
 
-4. **Double-click** `alko_app.exe` to launch the app.
+4. **Double-click** `AlkoCalculator.exe` to launch the app.
 
 No further installation is needed.
 
@@ -118,8 +118,8 @@ If you want to run or modify the code yourself:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/oskuuh43/alko_app.git
-   cd alko_app
+   git clone https://github.com/oskuuh43/BudgetBarshelf.git
+   cd BudgetBarshelf
 
 2. **Install the required dependencies**:
 
