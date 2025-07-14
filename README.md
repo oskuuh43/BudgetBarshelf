@@ -40,7 +40,7 @@ View and compare all Alko products based on their alcohol content per euro. This
 
 ### Light-mode enabled:
 
-The option to choose the applications theme based on your own preferenses.
+The option to choose the applications theme based on your own preferences.
 
 ![image](https://github.com/user-attachments/assets/4018327e-6b63-40b8-b0a2-825390bea0f1)
 
@@ -240,9 +240,9 @@ I created the **BudgetBarshelf** out of frustration with Alko’s lack of review
 
 This app solves that by introducing community reviews so you can get a bit more information before spending your money.
 
-The idea for the cocktail section came from a similar problem I noticed: I was tired of browsing cocktail recipes only to realize I dont have the right ingredients. With the bar shelf feature, you can now filter cocktails by what you already have at home, so you dont have to spend your time looking through cocktail recipes before finding something you can make.
+The idea for the cocktail section came from a similar problem I noticed: I was tired of browsing cocktail recipes only to realize I don't have the right ingredients. With the bar shelf feature, you can now filter cocktails by what you already have at home, so you don't have to spend your time looking through cocktail recipes before finding something you can make.
 
-I built BudgetBarshelf for people like me: frugal whiskey and rum enthusiasts who want to know they get their moneys worth when buying a new bottle to taste.
+I built BudgetBarshelf for people like me: frugal whiskey and rum enthusiasts who want to know they get their money's worth when buying a new bottle to taste.
 
 
 
