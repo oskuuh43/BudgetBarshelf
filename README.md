@@ -1,8 +1,8 @@
-# Alko Cocktail and Spirit Ratings App
+# BudgetBarshelf
 
 ## Overview
 
-**alko_app** is a desktop application designed to help users compare alcoholic beverages sold by the Finnish state-owned liquor store, **Alko**.
+**BudgetBarshelf** is a desktop application designed to help users compare alcoholic beverages sold by the Finnish state-owned liquor store, **Alko**.
 The application provides an "all in one" platform for browsing products by value and community ratings, with the added functionality of working as a "cocktail guide", helping you discover cocktails to make with the ingredients you have at home.
 
 ## Features
@@ -98,7 +98,7 @@ Detailed instructions for making the cocktails.
 If you just want to use the app without installing Python or dependencies:
 
 1. **Download the latest release** from the GitHub Releases page:  
-    [https://github.com/oskuuh43/alko_app/releases](https://github.com/oskuuh43/alko_app/releases)  -- add correct link --
+    https://github.com/oskuuh43/alko_app/releases/tag/v1.0.0
 
 2. **Unzip** the downloaded `.zip` file.
 
@@ -236,13 +236,13 @@ This file contains the list of ingredients you've selected in the “Manage My B
 
 ## Words from the creator
 
-I created the **alko_app** out of frustration with Alko’s lack of reviews on their website. As someone who enjoys tasting different rums and whiskeys, I found it frustrating that Alko’s website doesn't provide reviews for their products. Without ratings, choosing a new expensive bottle feels like a gamble.
+I created the **BudgetBarshelf** out of frustration with Alko’s lack of reviews on their website. As someone who enjoys tasting different rums and whiskeys, I found it frustrating that Alko’s website doesn't provide reviews for their products. Without ratings, choosing a new expensive bottle feels like a gamble.
 
 This app solves that by introducing community reviews so you can get a bit more information before spending your money.
 
 The idea for the cocktail section came from a similar problem I noticed: I was tired of browsing cocktail recipes only to realize I dont have the right ingredients. With the bar shelf feature, you can now filter cocktails by what you already have at home, so you dont have to spend your time looking through cocktail recipes before finding something you can make.
 
-I built alko_app for people like me: frugal whiskey and rum enthusiasts who want to know they get their moneys worth when buying a new bottle to taste.
+I built BudgetBarshelf for people like me: frugal whiskey and rum enthusiasts who want to know they get their moneys worth when buying a new bottle to taste.
 
 
 
