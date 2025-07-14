@@ -31,7 +31,7 @@ class WhiskeyRatingsWindow(QWidget):
     """
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
-        self.setWindowTitle("Whiskey Ratings from WhiskyScores")
+        self.setWindowTitle("Whiskey Ratings Window")
         self.resize(1400, 800)
         self.current_theme = theme
 
@@ -40,7 +40,7 @@ class WhiskeyRatingsWindow(QWidget):
         self.setLayout(self.layout)
 
         # Title Section
-        title_label = QLabel("Whiskey Ratings from WhiskyScores")
+        title_label = QLabel("Whiskey Ratings Window")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(title_label)

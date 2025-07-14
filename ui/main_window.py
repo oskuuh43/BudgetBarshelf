@@ -29,7 +29,7 @@ class MainWindow(QWidget):
     def __init__(self, initial_theme="light"):
         super().__init__()
         self.current_theme = initial_theme      # Darkmode/lightmode
-        self.setWindowTitle("Alcohol per Euro Calculator")    # Main Window Title
+        self.setWindowTitle("BudgetBarshelf")    # Main Window Title
         self.resize(1200, 800)      # Initial size of main window
 
         # Global layout for main window
@@ -38,7 +38,7 @@ class MainWindow(QWidget):
         self.layout.setSpacing(15)  # Spacing between elements
 
         # Title Label Settings
-        self.title_label = QLabel("Alcohol per Euro Calculator")
+        self.title_label = QLabel("BudgetBarshelf")
         self.title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))     # Font size and style
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)         # Centerd Title
         self.layout.addWidget(self.title_label)     # Add title to the layout

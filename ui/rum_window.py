@@ -29,7 +29,7 @@ class RumRatingsWindow(QWidget):
     """Window for displaying rum products with review data and user ratings."""
     def __init__(self, alko_df: pd.DataFrame, theme="light"):
         super().__init__()
-        self.setWindowTitle("Rum Ratings from the Rum Howler Blog")
+        self.setWindowTitle("Rum Ratings Window")
         self.resize(1400, 800)
         self.current_theme = theme
         self.layout = QVBoxLayout(self)
@@ -37,7 +37,7 @@ class RumRatingsWindow(QWidget):
 
 
         # Title label + info
-        title_label = QLabel("Rum Ratings from the Rum Howler Blog")
+        title_label = QLabel("Rum Ratings Window")
         title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(title_label)
